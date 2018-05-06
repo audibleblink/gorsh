@@ -5,6 +5,7 @@ package shell
 import (
 	"net"
 	"os/exec"
+	"syscall"
 )
 
 func GetShell() *exec.Cmd {
