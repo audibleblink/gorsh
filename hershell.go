@@ -11,8 +11,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sysdream/hershell/meterpreter"
-	"github.com/sysdream/hershell/shell"
+	"github.com/f47h3r/hershell/shell"
 )
 
 const (

