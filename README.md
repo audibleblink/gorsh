@@ -16,6 +16,8 @@ Learn about host-based OPSEC considerations when writing an implant.
 Changes after fork:
 
 * Uses tmux as a pseudo-C2-like interface, creating a new window with each agent callback
+* Download files with HTTP on all platform
+* Download files with SMB on all windows
 * Situational Awareness output on new shells
 * Removed Meterpreter functionality
 * Removed Shellcode execution

