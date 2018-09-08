@@ -13,7 +13,7 @@ Learn about host-based OPSEC considerations when writing an implant.
 ## Fork Changes
 Changes after fork:
 
-* Uses tmux as a psudeo-C2-like interface, creating a new window with each agent callback
+* Uses tmux as a pseudo-C2-like interface, creating a new window with each agent callback
 * Situational Awareness output on new shells
 * Removed Meterpreter functionality
 * Removed Shellcode execution
@@ -28,8 +28,8 @@ Potentially add reverse socks5 proxy functionality - Using
 
 ## Getting started
 
-Check out [official documentation](https://golang.org/doc/install) for an intro to developing with
-Go and settings up your Golang environment (with the `$GOPATH` environment variable).
+Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
+with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
 
 ### Building the payload
 
