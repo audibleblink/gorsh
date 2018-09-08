@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SOCKDIR=$(mktemp -d)
-SOCKF=${SOCKDIR}/usock
+SOCKDIR="$(mktemp -d)"
+SOCKF="${SOCKDIR}/usock"
 
 # Start tmux, if needed
 # tmux new -s GOSH
@@ -13,8 +13,5 @@ tmux new-window "socat UNIX-LISTEN:${SOCKF},umask=0077 STDIO"
 # Wait for socket
 while test ! -e ${SOCKF} ; do sleep 1 ; done
 
-echo FOuND SOCKF
-
 # Use socat to ship data between the unix socket and STDIO.
 exec socat STDIO UNIX-CONNECT:${SOCKF}
-echo CONNECTED SOCKF

