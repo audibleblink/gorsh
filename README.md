@@ -14,6 +14,7 @@ Learn about host-based OPSEC considerations when writing an implant.
 Changes after fork:
 
 * Uses tmux as a psudeo-C2-like interface, creating a new window with each agent callback
+* Situational Awareness output on new shells
 * Removed Meterpreter functionality
 * Removed Shellcode execution
 * Remove the use of passing power/shell commands at the gorsh prompt
