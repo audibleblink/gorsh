@@ -46,11 +46,13 @@ func Send(conn net.Conn, msg string) {
 
 func Intel(conn net.Conn) {
 	user, _ := user.Current()
-	userBlock := fmt.Sprintf("[User]\nusername=%s\nid=%s", user.Username, user.Uid)
+	userBlock := fmt.Sprintf("%8s | %8s\n%8s | %8s\n",
+		"User", user.Username, "ID", user.Uid)
 	Send(conn, userBlock)
 
 	dir, _ := os.Getwd()
-	dirBlock := fmt.Sprintf("[Directory]\nCurrent=%s\nHome=%s", dir, user.HomeDir)
+	dirBlock := fmt.Sprintf("%8s | %8s\n%8s | %8s\n",
+		"CurrDir", dir, "Home", user.HomeDir)
 
 	Send(conn, dirBlock)
 }
