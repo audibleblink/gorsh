@@ -2,10 +2,7 @@
 
 package shell
 
-import (
-	"net"
-	"os/exec"
-)
+import "os/exec"
 
 func GetShell() *exec.Cmd {
 	cmd := exec.Command("/bin/sh")

@@ -15,7 +15,7 @@ import (
 	"os/user"
 	"strings"
 
-	"./shell"
+	"github.com/audibleblink/gorsh/shell"
 	"code.cloudfoundry.org/bytefmt"
 )
 

@@ -3,7 +3,6 @@
 package shell
 
 import (
-	"net"
 	"os/exec"
 	"syscall"
 )
