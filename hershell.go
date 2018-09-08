@@ -130,7 +130,6 @@ func InteractiveShell(conn net.Conn) {
 					"cat <file>    -  Print the contents of the given file\n" +
 					"base64 <file> -  Base64 encode the given file and print\n\n"))
 			default:
-				// shell.ExecuteCmd(command, conn)
 				conn.Write([]byte("Command not implemented. Try 'help'\n"))
 			}
 
