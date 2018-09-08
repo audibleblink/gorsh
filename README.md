@@ -24,10 +24,13 @@ Changes after fork:
 * Remove the use of passing power/shell commands at the gorsh prompt
 * Add common file operation commands that use go instead of power/shell
 
-TODO:
+Roadmap:
 
-Potentially add reverse socks5 proxy functionality - Using
+- [ ] Potentially add reverse socks5 proxy functionality - Using
 [Numbers11/rvprxmx](https://github.com/Numbers11/rvprxmx)
+- [ ] Recon module for analyzing things like tasks, services, and host-based protections
+- [ ] Dotnet integration so `shell` drops into a Runspace with System.Management.Automation. 
+      Bacially PowerShell without PowerShell.
 
 
 ## Getting started
@@ -45,10 +48,10 @@ $ make depends
 
 To simplify things, read the provided Makefile. You can set the following environment variables:
 
--`GOOS`: the target OS
--`GOARCH`: the target architecture
--`LHOST`: the attacker IP or domain name
--`LPORT`: the listener port
+- `GOOS`: the target OS
+- `GOARCH`: the target architecture
+- `LHOST`: the attacker IP or domain name
+- `LPORT`: the listener port
 
 See possible`GOOS`and`GOARCH`variables [here](https://golang.org/doc/install/source#environment).
 
