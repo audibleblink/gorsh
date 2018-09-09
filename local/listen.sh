@@ -7,8 +7,9 @@ SOCKF="${SOCKDIR}/usock"
 # tmux new -s GOSH
 tmux has-session -t GOSH || tmux new-session -d -s GOSH
 
+IP=$(lsof -Pni | grep "socat.*$PORT" | tail -n 1 | sed 's/>/ /g' | awk '{ print $10 }')
 # Create window
-tmux new-window "socat UNIX-LISTEN:${SOCKF},umask=0077 STDIO"
+tmux new-window -n "$IP" "socat UNIX-LISTEN:${SOCKF},umask=0077 STDIO"
 
 # Wait for socket
 while test ! -e ${SOCKF} ; do sleep 1 ; done
