@@ -2,7 +2,8 @@
 
 [go]lang [r]everse [sh]ell
 
-![](https://i.imgur.com/AndZ567.png)
+![](https://i.imgur.com/x51XH6K.png)
+![](https://i.imgur.com/pvCmHYa.png)
 
 Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 
