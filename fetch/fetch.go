@@ -1,5 +1,3 @@
-// +build linux darwin freebsd !windows
-
 package fetch
 
 import (
@@ -7,14 +5,6 @@ import (
 	"net/http"
 	"os"
 )
-
-func Get(uri string, path string) (int64, error) {
-	size, err := _downloadFile(uri, path)
-	if err != nil {
-		return 0, err
-	}
-	return size, nil
-}
 
 func _downloadFile(uri string, path string) (int64, error) {
 	// Create the file
