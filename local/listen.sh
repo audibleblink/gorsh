@@ -2,13 +2,13 @@
 
 SOCKDIR="$(mktemp -d)"
 SOCKF="${SOCKDIR}/usock"
+NAME=GORSH
 
-# Start tmux, if needed
-# tmux new -s GOSH
-tmux has-session -t GOSH || tmux new-session -d -s GOSH
+# Start tmux in the background, if needed
+tmux has-session -t "${NAME}" || tmux new-session -d -s "${NAME}"
 
-# Create window
-tmux new-window "socat UNIX-LISTEN:${SOCKF},umask=0077 STDIO"
+# Create window in the created sessions
+tmux  new-window -t "${NAME}" "socat UNIX-LISTEN:${SOCKF},umask=0077 STDIO"
 
 # Wait for socket
 while test ! -e ${SOCKF} ; do sleep 1 ; done
