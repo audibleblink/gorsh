@@ -7,5 +7,5 @@ func Get(uri string, path string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return size, nil
+	return size, err
 }

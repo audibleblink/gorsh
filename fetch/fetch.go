@@ -27,6 +27,6 @@ func _downloadFile(uri string, path string) (int64, error) {
 		return 0, err
 	}
 
-	info, _ := out.Stat()
-	return info.Size(), nil
+	info, err := out.Stat()
+	return info.Size(), err
 }

