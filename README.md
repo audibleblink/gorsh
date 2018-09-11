@@ -29,9 +29,9 @@ Changes after fork:
 __NOTICE__: Requires go 1.11.
 Also, the zStandard compression library in this project uses `cgo` and thus you'll need the mingw
 compiler on Linux if you want to compile the Windows agents. It also only supports GOARCH=amd64, so
-32-bit agent use a less efficient gzip algo. 
+32-bit agents use a less efficient gzip algo.
 
-And so does the darwin64 until I can figure out a sane way to compile.
+And so does the darwin64 agent, until I can figure out a sane way to compile.
 
 Roadmap:
 
@@ -49,9 +49,13 @@ Because this project uses `cgo` and tries to cross-compile for linux/windows/mac
 windows compiler. I've only tried this on Debian, but since go1.11, you just need mingw installed.
 
 ```sh
-apt get install gcc-mingw-w64 binutils-mingw-w64-x86-64
+sudo apt install gcc-mingw-w64 binutils-mingw-w64-x86-64
+go get github.com/audibleblink/gorsh/...
+GOOS=windows go get github.com/audibleblink/gorsh/...
+cd $GOPATH/src/github.com/audibleblink/gorsh
 ```
-That's it as far cross-compiling to Windows64 goes. While it is often require during
+
+That's it, as far cross-compiling to Windows64 goes. While it is often required during
 cross-compilation to set variables like $CC, $CXX, $AS, $LD, ... it is not required as go1.11
 linux/amd64 picks up on the presence of the toolchain it needs.
 
@@ -92,7 +96,7 @@ $ make all LHOST=example.com LPOST=443
 
 ## Catching the shell
 
-The `make listen` command kicks off a tmux session and creates new windows on every new connection.
+The `make listen` target kicks off a tmux session and creates new windows with each new connection.
 Feed it a port number as LPORT.
 
 ```sh
