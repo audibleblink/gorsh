@@ -32,10 +32,10 @@ linux32:
 linux64:
 	GOOS=linux GOARCH=amd64 ${BUILD} ${LINUX_LDFLAGS} -o ${OUT_LINUX}64 ${SRC}
 
-windows32: mingw_packages
+windows32:
 	CGO_ENABLED=1 GOOS=windows GOARCH=386 ${BUILD} ${WIN_LDFLAGS} -o ${OUT_WINDOWS}32.exe ${SRC}
 
-windows64: mingw_packages
+windows64:
 	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 ${BUILD} ${WIN_LDFLAGS} -o ${OUT_WINDOWS}64.exe ${SRC}
 
 macos32:
