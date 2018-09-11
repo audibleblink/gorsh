@@ -22,7 +22,7 @@ depends:
 	openssl req -subj '/CN=sysdream.com/O=Sysdream/C=FR' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
 	cat ${SRV_KEY} >> ${SRV_PEM}
 
-start:
+listen:
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh
 
 linux32:

