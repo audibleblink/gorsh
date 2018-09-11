@@ -2,6 +2,12 @@
 
 package fetch
 
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
 func Get(uri string, path string) (int64, error) {
 	var (
 		err   error
