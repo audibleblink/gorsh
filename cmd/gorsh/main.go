@@ -16,9 +16,9 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/bytefmt"
-	"github.com/audibleblink/gorsh/fetch"
-	"github.com/audibleblink/gorsh/shell"
-	"github.com/audibleblink/gorsh/sitrep"
+	"github.com/audibleblink/gorsh/internal/fetch"
+	"github.com/audibleblink/gorsh/internal/shell"
+	"github.com/audibleblink/gorsh/internal/sitrep"
 )
 
 const (
