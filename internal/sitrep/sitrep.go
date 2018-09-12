@@ -48,7 +48,7 @@ func (h *Host) String() string {
 
 type Iface struct {
 	Name      string
-	Addresses string
+	Addresses []string
 }
 
 func (i *Iface) String() string {
@@ -136,10 +136,12 @@ func Getnetwork() string {
 	networks, _ := net.Interfaces()
 	for _, net := range networks {
 		addrs, _ := net.Addrs()
+		var ips []string
 		for _, addr := range addrs {
-			network := Iface{net.Name, addr.String()}
-			output += network.String()
+			ips = append(ips, addr.String())
 		}
+		network := Iface{net.Name, ips}
+		output += network.String()
 	}
 	return output
 }
