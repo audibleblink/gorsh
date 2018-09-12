@@ -15,7 +15,7 @@ import (
 	"os/user"
 	"strings"
 
-	"code.cloudfoundry.org/bytefmt"
+	"github.com/audibleblink/gorsh/internal/directory"
 	"github.com/audibleblink/gorsh/internal/fetch"
 	"github.com/audibleblink/gorsh/internal/shell"
 	"github.com/audibleblink/gorsh/internal/sitrep"
@@ -37,34 +37,6 @@ func Send(conn net.Conn, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
-}
-
-func ListDir(argv []string) (string, error) {
-	var path string
-
-	if len(argv) < 2 {
-		path = "./"
-	} else {
-		path = argv[1]
-	}
-
-	files, err := ioutil.ReadDir(path)
-
-	if err != nil {
-		return "", err
-	}
-
-	details := ""
-
-	for _, f := range files {
-		perms := f.Mode().String()
-		size := bytefmt.ByteSize(uint64(f.Size()))
-		modTime := f.ModTime().String()[0:19]
-		name := f.Name()
-		details = details + perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"
-	}
-
-	return details, err
 }
 
 // Takes a network connection as its arg so it can pass stdio to it
@@ -95,7 +67,7 @@ func InteractiveShell(conn net.Conn) {
 				RunShell(conn)
 
 			case "ls":
-				listing, err := ListDir(argv)
+				listing, err := directory.List(argv)
 				if err != nil {
 					Send(conn, err.Error())
 				} else {
@@ -124,7 +96,6 @@ func InteractiveShell(conn net.Conn) {
 				if len(argv) != 2 {
 					Send(conn, "Usage: cat <file>")
 				} else {
-
 					buf, err := ioutil.ReadFile(argv[1])
 
 					if err != nil {
