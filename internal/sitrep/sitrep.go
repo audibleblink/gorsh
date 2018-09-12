@@ -46,12 +46,12 @@ func (h *Host) String() string {
 	return out
 }
 
-type Iface struct {
+type Interface struct {
 	Name      string
 	Addresses []string
 }
 
-func (i *Iface) String() string {
+func (i *Interface) String() string {
 	template := "%10v | %-4v\n"
 	out := _printer(template, i)
 	return out
@@ -70,33 +70,47 @@ func (u *User) String() string {
 	return out
 }
 
-func All() string {
+func SysInfo() string {
 	var output string
-	output += Header("Host")
-	output += Gethost()
-	output += Header("User")
-	output += Getuser()
-	output += Header("Network")
-	output += Getnetwork()
+	output += header("Host")
+	if host, err := HostInfo(); err == nil {
+		output += host.String()
+	}
+	output += header("User")
+	if user, err := UserInfo(); err == nil {
+		output += user.String()
+	}
+	output += header("Network")
+	if networks, err := NetworkInfo(); err == nil {
+		var netString string
+		for _, net := range networks {
+			netString += net.String()
+		}
+		output += netString
+	}
 	dir, _ := os.Getwd()
 	output += fmt.Sprintf("Current Directory: %s", dir)
 	return output
 }
 
-func Header(name string) string {
+func Processes() string {
 	var output string
-	output += "\n========================================\n"
-	output += name + "\n"
-	output += "========================================\n"
-	return output
-}
-
-func Gethost() string {
-	info, err := host.Info()
+	processes, err := ProcessInfo()
 	if err != nil {
 		return err.Error()
 	}
-	// "%8s | %4s\n",
+	for _, process := range processes {
+		output += process.String()
+	}
+	return output
+}
+
+func HostInfo() (Host, error) {
+	info, err := host.Info()
+	if err != nil {
+		return Host{}, err
+	}
+
 	host := Host{
 		info.Hostname,
 		info.Procs,
@@ -106,15 +120,14 @@ func Gethost() string {
 		info.PlatformVersion,
 		info.KernelVersion}
 
-	return host.String()
+	return host, err
 }
 
-func Processes() string {
-	var output string
-
+func ProcessInfo() ([]Process, error) {
+	var results []Process
 	procs, err := process.Processes()
 	if err != nil {
-		fmt.Printf(err.Error())
+		return []Process{}, err
 	}
 	for _, p := range procs {
 		pid := p.Pid
@@ -125,31 +138,40 @@ func Processes() string {
 		cmd, _ := p.Cmdline()
 
 		proc := Process{pid, ppid, name, user, exe, cmd}
-		output += proc.String()
+		results = append(results, proc)
 	}
-	return output
+	return results, err
 }
 
-func Getnetwork() string {
-	var output string
+func NetworkInfo() ([]Interface, error) {
+	var (
+		err     error
+		results []Interface
+	)
 
-	networks, _ := net.Interfaces()
+	networks, err := net.Interfaces()
 	for _, net := range networks {
-		addrs, _ := net.Addrs()
+		addrs, err := net.Addrs()
+		if err != nil {
+			continue
+		}
 		var ips []string
 		for _, addr := range addrs {
 			ips = append(ips, addr.String())
 		}
-		network := Iface{net.Name, ips}
-		output += network.String()
+		network := Interface{net.Name, ips}
+		results = append(results, network)
 	}
-	return output
+	return results, err
 }
 
-func Getuser() string {
-	userData, _ := user.Current()
+func UserInfo() (User, error) {
+	userData, err := user.Current()
+	if err != nil {
+		return User{}, err
+	}
 	user := User{userData.Username, userData.Uid, userData.Gid, userData.HomeDir}
-	return user.String()
+	return user, err
 }
 
 func _printer(template string, p Printable) string {
@@ -159,5 +181,13 @@ func _printer(template string, p Printable) string {
 		output += fmt.Sprintf(template, k, v)
 	}
 	output += "\n"
+	return output
+}
+
+func header(name string) string {
+	var output string
+	output += "\n========================================\n"
+	output += name + "\n"
+	output += "========================================\n"
 	return output
 }
