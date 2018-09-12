@@ -6,18 +6,80 @@ import (
 	"os"
 	"os/user"
 
+	"github.com/fatih/structs"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/process"
 )
 
+type Printable interface {
+	String() string
+}
+
+type Process struct {
+	PID     int32
+	PPID    int32
+	Name    string
+	Owner   string
+	Exe     string
+	Cmdline string
+}
+
+func (p *Process) String() string {
+	template := "%8v | %-4v\n"
+	out := _printer(template, p)
+	return out
+}
+
+type Host struct {
+	Hostname string
+	Procs    uint64
+	OS       string
+	Platform string
+	Family   string
+	Version  string
+	Kernel   string
+}
+
+func (h *Host) String() string {
+	template := "%8v | %-4v\n"
+	out := _printer(template, h)
+	return out
+}
+
+type Iface struct {
+	Name      string
+	Addresses string
+}
+
+func (i *Iface) String() string {
+	template := "%10v | %-4v\n"
+	out := _printer(template, i)
+	return out
+}
+
+type User struct {
+	Username string
+	Uid      string
+	Gid      string
+	Homedir  string
+}
+
+func (u *User) String() string {
+	template := "%8v | %-4v\n"
+	out := _printer(template, u)
+	return out
+}
+
 func All() string {
 	var output string
 	output += Header("Host")
-	output += HostInfo()
+	output += Gethost()
 	output += Header("User")
-	output += User()
+	output += Getuser()
 	output += Header("Network")
-	output += Network()
+	output += Getnetwork()
+	dir, _ := os.Getwd()
+	output += fmt.Sprintf("Current Directory: %s", dir)
 	return output
 }
 
@@ -29,26 +91,22 @@ func Header(name string) string {
 	return output
 }
 
-func HostInfo() string {
+func Gethost() string {
 	info, err := host.Info()
 	if err != nil {
 		return err.Error()
 	}
-	infoBlock := fmt.Sprintf("%8s | %4s\n"+
-		"%8s | %4d\n"+
-		"%8s | %4s\n"+
-		"%8s | %4s\n"+
-		"%8s | %4s\n"+
-		"%8s | %4s\n"+
-		"%8s | %4s\n",
-		"Hostname", info.Hostname,
-		"Procs", info.Procs,
-		"OS", info.OS,
-		"Platform", info.Platform,
-		"Family", info.PlatformFamily,
-		"Version", info.PlatformVersion,
-		"Kernel", info.KernelVersion)
-	return infoBlock + "\n"
+	// "%8s | %4s\n",
+	host := Host{
+		info.Hostname,
+		info.Procs,
+		info.OS,
+		info.Platform,
+		info.PlatformFamily,
+		info.PlatformVersion,
+		info.KernelVersion}
+
+	return host.String()
 }
 
 func Processes() string {
@@ -58,59 +116,46 @@ func Processes() string {
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
-	for _, proc := range procs {
-		pid := proc.Pid
-		ppid, _ := proc.Ppid()
-		name, _ := proc.Name()
-		exe, _ := proc.Exe()
-		cmd, _ := proc.Cmdline()
-		user, _ := proc.Username()
-		procBlock := fmt.Sprintf("%8s | %4d\n"+
-			"%8s | %4d\n"+
-			"%8s | %4s\n"+
-			"%8s | %4s\n"+
-			"%8s | %4s\n"+
-			"%8s | %4s\n",
-			"PID", pid,
-			"PPID", ppid,
-			"Name", name,
-			"Owner", user,
-			"exe", exe,
-			"Cmdline", cmd)
-		output += (procBlock + "\n")
+	for _, p := range procs {
+		pid := p.Pid
+		ppid, _ := p.Ppid()
+		name, _ := p.Name()
+		user, _ := p.Username()
+		exe, _ := p.Exe()
+		cmd, _ := p.Cmdline()
+
+		proc := Process{pid, ppid, name, user, exe, cmd}
+		output += proc.String()
 	}
 	return output
-
 }
 
-func Network() string {
+func Getnetwork() string {
 	var output string
 
-	ifaces, _ := net.Interfaces()
-	for _, iface := range ifaces {
-		output += fmt.Sprintf("%8s | ", iface.Name)
-		addrs, _ := iface.Addrs()
+	networks, _ := net.Interfaces()
+	for _, net := range networks {
+		addrs, _ := net.Addrs()
 		for _, addr := range addrs {
-			output += fmt.Sprintf("%-18s\t", addr.String())
+			network := Iface{net.Name, addr.String()}
+			output += network.String()
 		}
-		output += "\n"
 	}
 	return output
 }
 
-func User() string {
+func Getuser() string {
+	userData, _ := user.Current()
+	user := User{userData.Username, userData.Uid, userData.Gid, userData.HomeDir}
+	return user.String()
+}
+
+func _printer(template string, p Printable) string {
+	sMap := structs.Map(p)
 	var output string
-	user, _ := user.Current()
-	userBlock := fmt.Sprintf("%8s | %4s\n"+
-		"%8s | %4s\n",
-		"User", user.Username, "ID", user.Uid)
-	output += userBlock
-
-	dir, _ := os.Getwd()
-	dirBlock := fmt.Sprintf("%8s | %4s\n"+
-		"%8s | %4s\n",
-		"CurrDir", dir, "Home", user.HomeDir)
-
-	output += dirBlock
+	for k, v := range sMap {
+		output += fmt.Sprintf(template, k, v)
+	}
+	output += "\n"
 	return output
 }
