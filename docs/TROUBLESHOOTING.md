@@ -1,4 +1,6 @@
-# Developers Notes: understanding issues related to building (USER CAN IGNORE THIS)
+## Troubleshooting
+
+Understanding issues related to building (USER CAN IGNORE THIS)
 
 ## Build problems
 
@@ -22,7 +24,7 @@ or
 ../src/github.com/valyala/gozstd/stream.go:47:20: undefined: Writer
 ```
 
-The reason is because you need CGO_ENABLED=1 before your command. Simple fix.
+The reason is because you need `CGO_ENABLED=1` before your command. Simple fix.
 
 #### 32/64 issue when compiling on native architecture for two word register sizes
 
@@ -74,16 +76,19 @@ make: *** [windows64] Error 2
 
 The solution is to set CC in your environment to the correct mingw 64bit-64bit gcc-posix compiler. For example, on a native 64-bit system running Debian:
 
- `export CC=/usr/bin/x86_64-w64-mingw32-gcc-6.3-posix`
+`export CC=/usr/bin/x86_64-w64-mingw32-gcc-6.3-posix`
 
- After this, `make windows64` should work just fine
+After this, `make windows64` should work just fine
 
+## Developer Notes
 
 ### Issue #1 - Ensuring appropriate mingw compilers are available on your system
 
-DEBIAN: `sudo apt-get install -y gcc-mingw-w64 g++-mingw-w64 binutils-mingw-w64-x86-64` REDHAT:
-`sudo yum install mingw64-gcc mingw64-g+++ mingw64-binutils` ARCH: 	`sudo packman -S
-mingw-w64-gcc mingw-w64-g++ mingw-w64-binutils`
+DEBIAN: `sudo apt-get install -y gcc-mingw-w64 g++-mingw-w64 binutils-mingw-w64-x86-64` 
+
+REDHAT: `sudo yum install mingw64-gcc mingw64-g+++ mingw64-binutils` 
+
+ARCH: 	`sudo packman -S mingw-w64-gcc mingw-w64-g++ mingw-w64-binutils`
 
 ### Issue #2 - Multilib builds of GCC are problematic when building on native host
 
@@ -95,7 +100,7 @@ because a library requiring native-c compilating was built using the hosts nativ
 This is not a huge problem, but it is an annoyance when having to build packages often.
 
 Aside from not running a multilib-capable compiler on your system (this doesn't mean necessarily
-you won't have a muultilib system), the solution may be to maintain a pair of dedicated
+you won't have a multilib system), the solution may be to maintain a pair of dedicated
 (non-multilib) compilers, and ensure that the `go get` or `go build` process uses those.
 Alternately, look into how one can pass CFLAGS during `go get` or `go build` of an external
 package. 
