@@ -107,7 +107,7 @@ func init() {
 			"Situation Awareness information",
 			0,
 			false,
-			helpFn},
+			sitrepFn},
 		&Command{
 			"help",
 			"",
