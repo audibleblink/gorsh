@@ -25,16 +25,6 @@ Also, the zStandard compression library in this project uses `cgo` and thus you'
 compiler on Linux if you want to compile the Windows agents. It also only supports GOARCH=amd64, so
 32-bit agents use a less efficient gzip algo.
 
-Roadmap:
-
-- [ ] Potentially add reverse socks5 proxy functionality - Using
-[Numbers11/rvprxmx](https://github.com/Numbers11/rvprxmx)
-- [ ] Recon module for analyzing things like tasks, services, and host-based protections
-- [ ] Dotnet integration so `shell` drops into a Runspace with System.Management.Automation. 
-      Bacially PowerShell without PowerShell.
-- [ ] Fix CGO compilation for macos64 so it uses zstd for compression instead of gzip
-
-
 ## Getting started
 
 Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
@@ -46,7 +36,7 @@ Because this project uses `cgo` and tries to cross-compile for linux/windows/mac
 windows compiler. I've only tried this on Debian, but since go1.11, you just need mingw installed.
 
 ```sh
-sudo apt install gcc-mingw-w64 binutils-mingw-w64-x86-64
+sudo apt install gcc-mingw-w64 binutils-mingw-w64-x86-64 tmux socat
 go get github.com/audibleblink/gorsh/...
 GOOS=windows go get github.com/audibleblink/gorsh/...
 cd $GOPATH/src/github.com/audibleblink/gorsh
@@ -62,15 +52,6 @@ First, generate your certs:
 ```bash
 $ make depends
 ```
-
-You can set the following environment variables to compile using `go build`:
-See possible`GOOS`and`GOARCH`variables [here](https://golang.org/doc/install/source#environment).
-
-- `GOOS`: the target OS
-- `GOARCH`: the target architecture
-- `LHOST`: the attacker IP or domain name
-- `LPORT`: the listener port
-
 
 For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
 
