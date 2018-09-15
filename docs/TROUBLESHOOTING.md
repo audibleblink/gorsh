@@ -1,3 +1,16 @@
+Because this project uses `cgo` and tries to cross-compile for linux/windows/macos, you'll need a
+windows compiler. I've only tried this on Debian, but since go1.11, you just need mingw installed.
+
+```sh
+sudo apt install gcc-mingw-w64 binutils-mingw-w64-x86-64 tmux socat
+go get github.com/audibleblink/gorsh/...
+GOOS=windows go get github.com/audibleblink/gorsh/...
+cd $GOPATH/src/github.com/audibleblink/gorsh
+```
+
+While it is often required during cross-compilation to set variables like $CC, $CXX, $AS, $LD, ...
+it is not required as go1.11 linux/amd64 picks up on the presence of the toolchain it needs.
+
 ## Troubleshooting
 
 Understanding issues related to building (USER CAN IGNORE THIS)

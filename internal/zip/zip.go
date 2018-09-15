@@ -1,4 +1,4 @@
-// +build 386 darwin,amd64
+// +build !zstd
 
 package zip
 
