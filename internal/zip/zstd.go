@@ -1,4 +1,4 @@
-// +build linux,amd64 windows,amd64
+// +build zstd
 
 package zip
 

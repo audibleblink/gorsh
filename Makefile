@@ -18,6 +18,11 @@ WIN_LDFLAGS=--ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X ma
 
 MINGW=x86_64-w64-mingw32-gcc-7.3-posix
 
+# zStd is a highly efficient compression library that requires CGO compilation If you'd like to
+# turn this feature on and have experience cross-compiling with cgo, enable the feature below for
+# win/64 and linux/64 implants ZSTD=-tags zstd
+ZSTD=
+
 all: linux64 windows64 macos64 linux32 macos32 windows32 
 
 depends:
@@ -28,14 +33,13 @@ listen:
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh
 
 linux64:
-	GOOS=linux GOARCH=amd64 ${BUILD} ${LINUX_LDFLAGS} -o ${OUT_LINUX}64 ${SRC}
+	GOOS=linux GOARCH=amd64 ${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT_LINUX}64 ${SRC}
 
 windows64:
-	CC=${MINGW} \
-	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 ${BUILD} ${WIN_LDFLAGS} -o ${OUT_WINDOWS}64.exe ${SRC}
+	# CGO_ENABLED=1 CC=${MINGW} 
+	GOOS=windows GOARCH=amd64 ${BUILD} ${ZSTD} ${WIN_LDFLAGS} -o ${OUT_WINDOWS}64.exe ${SRC}
 
 macos64:
-	@echo "macOS amd64 currently broken. Fix in progress"
 	GOOS=darwin GOARCH=amd64 ${BUILD} ${LINUX_LDFLAGS} -o ${OUT_MACOS}64 ${SRC}
 
 linux32:

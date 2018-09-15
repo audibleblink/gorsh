@@ -17,33 +17,20 @@ Learn about host-based OPSEC considerations when writing an implant.
 
 See the [Changelog](./docs/CHANGELOG.md)
 
-## Project Notes
-
-__NOTICE__: Requires go 1.11.
-
-Also, the zStandard compression library in this project uses `cgo` and thus you'll need the mingw
-compiler on Linux if you want to compile the Windows agents. It also only supports GOARCH=amd64, so
-32-bit agents use a less efficient gzip algo.
-
 ## Getting started
 
 Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
 with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
 
-Make sure to read the Makefile. It gives you a good idea of what's going on.
-
-Because this project uses `cgo` and tries to cross-compile for linux/windows/macos, you'll need a
-windows compiler. I've only tried this on Debian, but since go1.11, you just need mingw installed.
-
-```sh
-sudo apt install gcc-mingw-w64 binutils-mingw-w64-x86-64 tmux socat
+```bash
 go get github.com/audibleblink/gorsh/...
-GOOS=windows go get github.com/audibleblink/gorsh/...
 cd $GOPATH/src/github.com/audibleblink/gorsh
 ```
-
-While it is often required during cross-compilation to set variables like $CC, $CXX, $AS, $LD, ...
-it is not required as go1.11 linux/amd64 picks up on the presence of the toolchain it needs.
+Be sure to read the Makefile. It gives you a good idea of what's going on.
+If enabled in `Makefile`, the `zipcat` cmdlet uses the zStandard compression library which requires
+`cgo` compilation.
+Leave the defaults in the Makefile unless you're familiar with cross-compilation and cgo and have
+the toolchains for it, or read [here](./docs/TROUBLESHOOTING.md) if you're feeling adventurous.
 
 ### Usage
 
@@ -77,6 +64,8 @@ make listen LPORT=8080
 # once a client connects
 tmux attach -t GORSH
 ```
+
+If your `socat` has been compiled with `READLINE` support, you get command history for free.
 
 Shells can also be caught without tmux using:
 
