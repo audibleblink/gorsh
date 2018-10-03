@@ -22,10 +22,14 @@ See the [Changelog](./docs/CHANGELOG.md)
 Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
 with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
 
+
 ```bash
 go get github.com/audibleblink/gorsh/...
 cd $GOPATH/src/github.com/audibleblink/gorsh
 ```
+
+Makefile assumes this project is being built on Linux.
+
 Be sure to read the Makefile. It gives you a good idea of what's going on.
 If enabled in `Makefile`, the `zipcat` cmdlet uses the zStandard compression library which requires
 `cgo` compilation.
@@ -34,11 +38,14 @@ the toolchains for it, or read [here](./docs/TROUBLESHOOTING.md) if you're feeli
 
 ### Usage
 
-First, generate your certs:
+First, generate your certs and ssh keys for the reverse proxy.
 
 ```bash
 $ make depends
 ```
+
+If you want to use `socks` feature, edit `configs/ssh.json`. Create a user on the SSH server
+and give it a `/bin/false` shell in `/etc/passwd`
 
 For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
 
