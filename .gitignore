@@ -1,4 +1,4 @@
-hershell
-hershell.exe
 server.*
 binaries
+id_*
+ssh.json

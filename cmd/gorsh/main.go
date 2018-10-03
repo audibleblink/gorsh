@@ -82,7 +82,7 @@ func CheckKeyPin(conn *tls.Conn, fingerprint []byte) bool {
 	return valid
 }
 
-// Creates the TLS connection before passing it to the InteractiveShell function
+// Reverse creates the TLS connection before passing it to the InteractiveShell function
 func Reverse(connectString string, fingerprint []byte) {
 	var (
 		conn *tls.Conn
