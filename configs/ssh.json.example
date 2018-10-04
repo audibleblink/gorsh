@@ -1,0 +1,5 @@
+{
+    "username": "proxyuser",
+    "host": "10.10.14.12", 
+    "port": 22
+}

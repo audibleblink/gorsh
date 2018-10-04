@@ -11,7 +11,7 @@ import (
 	"github.com/shirou/gopsutil/process"
 )
 
-type Printable interface {
+type printable interface {
 	String() string
 }
 
@@ -123,6 +123,7 @@ func HostInfo() (Host, error) {
 	return host, err
 }
 
+// ProcessInfo returns the list of interface for the current host
 func ProcessInfo() ([]Process, error) {
 	var results []Process
 	procs, err := process.Processes()
@@ -143,6 +144,7 @@ func ProcessInfo() ([]Process, error) {
 	return results, err
 }
 
+// NetworkInfo returns the list of interface for the current host
 func NetworkInfo() ([]Interface, error) {
 	var (
 		err     error
@@ -165,6 +167,7 @@ func NetworkInfo() ([]Interface, error) {
 	return results, err
 }
 
+// UserInfo returns data about the current user like their UID/GID and home directory
 func UserInfo() (User, error) {
 	userData, err := user.Current()
 	if err != nil {
@@ -174,7 +177,7 @@ func UserInfo() (User, error) {
 	return user, err
 }
 
-func _printer(template string, p Printable) string {
+func _printer(template string, p printable) string {
 	sMap := structs.Map(p)
 	var output string
 	for k, v := range sMap {
