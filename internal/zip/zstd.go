@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 )
 
+// Bytes compresses the file contents of the given filepath string
 func Bytes(path string) ([]byte, error) {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {

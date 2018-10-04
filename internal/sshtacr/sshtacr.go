@@ -49,12 +49,18 @@ func handleClient(client net.Conn, remote net.Conn) {
 	<-chDone
 }
 
+// ForwardService implements reverse port forwarding similar to the -R flag
+// in openssh-client. Configuration is done in the /configs/ssh.json file.
+// NOTE The generated keys and ssh.json data are embedded in the binary so
+// take the appropriate precautions when setting up the ssh server user.
 func ForwardService(port string) {
 
-	connectStr := fmt.Sprintf("127.0.0.1:%s", port)
+	// unpack the configs and ssh keys from the binary
+	// the were packed at compile-time
 	box := packr.NewBox("../../configs")
 	privateKeyString := box.Bytes("id_ed25519")
 	configs := box.Bytes("ssh.json")
+
 	server := sshServer{}
 	if err := json.Unmarshal(configs, &server); err != nil {
 		panic(err)
@@ -69,22 +75,23 @@ func ForwardService(port string) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	// Connect to SSH remote server using serverEndpoint
+	// Connect to SSH server
 	serverConn, err := ssh.Dial("tcp", server.String(), sshConfig)
 	if err != nil {
 		log.Fatalln(fmt.Printf("Dial INTO remote server error: %s", err))
 	}
 
-	// Listen on remote server port
+	// Publish the designated local port to the same port on the remote SSH server
+	connectStr := fmt.Sprintf("127.0.0.1:%s", port)
 	listener, err := serverConn.Listen("tcp", connectStr)
 	if err != nil {
 		log.Fatalln(fmt.Printf("Listen open port ON remote server error: %s", err))
 	}
 	defer listener.Close()
 
-	// handle incoming connections on reverse forwarded tunnel
+	// Handle incoming request from the remote tunnel
 	for {
-		// Open a (local) connection to localEndpoint whose content will be forwarded so serverEndpoint
+		// Open a (local) connection to localEndpoint whose content will be forwarded
 		local, err := net.Dial("tcp", connectStr)
 		if err != nil {
 			log.Fatalln(fmt.Printf("Dial INTO local service error: %s", err))
