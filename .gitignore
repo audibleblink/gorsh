@@ -1,4 +1,4 @@
 server.*
-binaries
+build
 id_*
 ssh.json
