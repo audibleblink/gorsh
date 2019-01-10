@@ -7,7 +7,7 @@ SRV_KEY=scripts/server.key
 SRV_PEM=scripts/server.pem
 
 BUILD=packr build
-SRC=cmd/gorsh/main.go
+SRC=cmd/gorsh/*
 
 FINGERPRINT=$(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
 STRIP=-s
@@ -35,11 +35,12 @@ depends:
 	@echo
 	@echo "================================================="
 	@echo "Create a user with a /bin/false shell on the target ssh server."
+	@echo "useradd -s /bin/false -m -d /home/sshuser -N sshuser"
+	@echo
 	@echo "Append the following line to that user's authorized_keys file:"
+	@echo "NO-X11-FORWARDING,PERMITOPEN=\"0.0.0.0:1080\" `cat ./configs/id_ed25519.pub`"
 	@echo
-	@echo "NO-X11-FORWARDING PERMITOPEN=0.0.0.0:1080 `cat ./configs/id_ed25519.pub`"
-	@echo
-	@echo "If you know your targets' public IP, you can also prepend the above with:"
+	@echo "If you know your target's public IP, you can also prepend the above with:"
 	@echo "FROM=<ip or hostname>"
 	@echo "================================================="
 

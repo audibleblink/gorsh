@@ -56,10 +56,13 @@ func handleClient(client net.Conn, remote net.Conn) {
 func ForwardService(port string) {
 
 	// unpack the configs and ssh keys from the binary
-	// the were packed at compile-time
+	// that were packed at compile-time
 	box := packr.NewBox("../../configs")
-	privateKeyString := box.Bytes("id_ed25519")
-	configs := box.Bytes("ssh.json")
+	privateKeyString, err := box.Find("id_ed25519")
+	configs, err := box.Find("ssh.json")
+	if err != nil {
+		panic(err)
+	}
 
 	server := sshServer{}
 	if err := json.Unmarshal(configs, &server); err != nil {
