@@ -61,6 +61,13 @@ func init() {
 			ArgReq:   false,
 			cmdFn:    cdFn},
 		&command{
+			Name:     "rm",
+			ArgHint:  "[path]",
+			Desc:     "Delete a file",
+			ArgCount: 1,
+			ArgReq:   true,
+			cmdFn:    rmFn},
+		&command{
 			Name:     "ls",
 			ArgHint:  "[path]",
 			Desc:     "List the current working directory",
