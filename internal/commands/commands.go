@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/user"
+	"path/filepath"
 
 	"github.com/audibleblink/gorsh/internal/directory"
 	"github.com/audibleblink/gorsh/internal/fetch"
@@ -15,6 +16,7 @@ import (
 )
 
 type cmdFunc func(...string) string
+type genFunc func(string) ([]byte, error)
 
 type command struct {
 	Name     string
@@ -162,7 +164,16 @@ func socksFn(argv ...string) string {
 
 func cdFn(argv ...string) string {
 	if len(argv) > 1 {
-		os.Chdir(argv[1])
+		paths, err := filepath.Glob(argv[1])
+		if err != nil {
+			return err.Error()
+		}
+
+		if len(paths) == 1 {
+			os.Chdir(paths[0])
+		} else {
+			return "Glob return more than 1 result"
+		}
 	} else {
 		usr, _ := user.Current()
 		os.Chdir(usr.HomeDir)
@@ -206,10 +217,11 @@ func psFn(argv ...string) string {
 }
 
 func catFn(file ...string) string {
-	output, err := ioutil.ReadFile(file[1])
+	output, err := _handleGlob(file[1], ioutil.ReadFile)
 	if err != nil {
 		return err.Error()
 	}
+
 	return string(output)
 }
 
@@ -252,6 +264,25 @@ func helpFn(args ...string) string {
 		output += fmt.Sprintf(cmd.Help())
 	}
 	return output
+}
+
+func _handleGlob(path string, cb genFunc) (string, error) {
+	matches, err := filepath.Glob(path)
+	if err != nil {
+		return "", err
+	}
+
+	var result string
+	var errors string
+	for _, file := range matches {
+		output, err := ioutil.ReadFile(file)
+		if err != nil {
+			errors += fmt.Sprintf("%s\n", err.Error())
+		}
+
+		result += fmt.Sprintf("%s\n", output)
+	}
+	return result + errors, err
 }
 
 func _find(cmd string) *command {
