@@ -54,6 +54,13 @@ func init() {
 			ArgReq:   true,
 			cmdFn:    socksFn},
 		&command{
+			Name:     "env",
+			ArgHint:  "",
+			Desc:     "Dump the ENV",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    envFn},
+		&command{
 			Name:     "cd",
 			ArgHint:  "[path]",
 			Desc:     "Change the process' working directory",
@@ -162,6 +169,19 @@ func cdFn(argv ...string) string {
 	}
 	dir, _ := os.Getwd()
 	return fmt.Sprintf("Current Directory: %s", dir)
+}
+
+func envFn(argv ...string) string {
+	return sitrep.Environ()
+}
+
+func rmFn(argv ...string) string {
+	err := os.RemoveAll(argv[1])
+
+	if err != nil {
+		return err.Error()
+	}
+	return "Object Deleted."
 }
 
 func lsFn(argv ...string) string {

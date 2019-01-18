@@ -194,3 +194,12 @@ func header(name string) string {
 	output += "========================================\n"
 	return output
 }
+
+func Environ() string {
+	data := os.Environ()
+	var output string
+	for _, el := range data {
+		output += el + "\n"
+	}
+	return output
+}
