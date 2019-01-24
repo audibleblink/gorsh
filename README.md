@@ -15,6 +15,8 @@ Learn about host-based OPSEC considerations when writing an implant.
 
 ## Fork Changes
 
+**Require go1.11+**
+
 See the [Changelog](./docs/CHANGELOG.md)
 
 ## Getting started

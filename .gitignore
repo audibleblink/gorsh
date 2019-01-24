@@ -2,3 +2,4 @@ server.*
 build
 id_*
 ssh.json
+*-packr.go
