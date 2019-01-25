@@ -14,7 +14,7 @@ STRIP=-s
 LINUX_LDFLAGS=--ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 WIN_LDFLAGS=--ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT} -H windowsgui"
 
-MINGW=x86_64-w64-mingw32-gcc-7.3-posix
+MINGW=x86_64-w64-mingw32-gcc-6.3-win32
 
 # zStd is a highly efficient compression library that requires CGO compilation If you'd like to
 # turn this feature on and have experience cross-compiling with cgo, enable the feature below for
@@ -51,7 +51,7 @@ listen:
 linux64:
 	$(eval GOOS=linux)
 	$(eval GOARCH=amd64)
-	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} ${ZSTD} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 linux32:
 	$(eval GOOS=linux)
@@ -61,7 +61,7 @@ linux32:
 linux_arm64:
 	$(eval GOOS=linux)
 	$(eval GOARCH=arm64)
-	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} ${ZSTD} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 linux_arm:
 	$(eval GOOS=linux)
@@ -69,20 +69,20 @@ linux_arm:
 	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 windows64:
-	# CGO_ENABLED=1 CC=${MINGW}
 	$(eval GOOS=windows)
 	$(eval GOARCH=amd64)
+	# CGO_ENABLED=1 CC=${MINGW} 
 	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${ZSTD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 windows32:
 	$(eval GOOS=windows)
 	$(eval GOARCH=386)
-	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${ZSTD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 macos64:
 	$(eval GOOS=darwin)
 	$(eval GOARCH=amd64)
-	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} ${ZSTD} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 macos32:
 	$(eval GOOS=darwin)

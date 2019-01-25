@@ -9,5 +9,6 @@ require (
 	github.com/gobuffalo/packr v1.21.9
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
+	github.com/valyala/gozstd v1.2.1
 	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 )
