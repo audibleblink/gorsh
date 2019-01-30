@@ -185,7 +185,7 @@ func cdFn(argv ...string) string {
 		if len(paths) == 1 {
 			os.Chdir(paths[0])
 		} else {
-			return "Glob return more than 1 result"
+			return "Glob returned more than 1 result"
 		}
 	} else {
 		usr, _ := user.Current()
