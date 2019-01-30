@@ -53,7 +53,7 @@ func handleClient(client net.Conn, remote net.Conn) {
 // in openssh-client. Configuration is done in the /configs/ssh.json file.
 // NOTE The generated keys and ssh.json data are embedded in the binary so
 // take the appropriate precautions when setting up the ssh server user.
-func ForwardService(port string) {
+func ForwardService(port string) error {
 
 	// unpack the configs and ssh keys from the binary
 	// that were packed at compile-time
@@ -61,12 +61,12 @@ func ForwardService(port string) {
 	privateKeyString, err := box.Find("id_ed25519")
 	configs, err := box.Find("ssh.json")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	server := sshServer{}
 	if err := json.Unmarshal(configs, &server); err != nil {
-		panic(err)
+		return err
 	}
 
 	privateKey, err := ssh.ParsePrivateKey(privateKeyString)
@@ -81,31 +81,15 @@ func ForwardService(port string) {
 	// Connect to SSH server
 	serverConn, err := ssh.Dial("tcp", server.String(), sshConfig)
 	if err != nil {
-		log.Fatalln(fmt.Printf("Dial INTO remote server error: %s", err))
+		return fmt.Errorf("Dial INTO remote server error: %s", err)
 	}
 
 	// Publish the designated local port to the same port on the remote SSH server
 	connectStr := fmt.Sprintf("127.0.0.1:%s", port)
 	listener, err := serverConn.Listen("tcp", connectStr)
 	if err != nil {
-		log.Fatalln(fmt.Printf("Listen open port ON remote server error: %s", err))
+		return fmt.Errorf(fmt.Sprintf("INFO: %s", err))
 	}
 	defer listener.Close()
-
-	// Handle incoming request from the remote tunnel
-	for {
-		// Open a (local) connection to localEndpoint whose content will be forwarded
-		local, err := net.Dial("tcp", connectStr)
-		if err != nil {
-			log.Fatalln(fmt.Printf("Dial INTO local service error: %s", err))
-		}
-
-		client, err := listener.Accept()
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		handleClient(client, local)
-	}
-
+	return err
 }

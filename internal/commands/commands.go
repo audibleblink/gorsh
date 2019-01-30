@@ -167,8 +167,12 @@ func Route(argv []string) string {
 
 // Command functions
 func socksFn(argv ...string) string {
-	socks.ListenAndForward(argv[1])
-	return "OK."
+	// concurrent function that starts socks server and forwards back over ssh
+	err := socks.ListenAndForward(argv[1])
+	if err != nil {
+		return err.Error()
+	}
+	return "Done"
 }
 
 func cdFn(argv ...string) string {
