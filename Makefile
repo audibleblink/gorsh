@@ -74,12 +74,12 @@ windows64:
 	$(eval GOOS=windows)
 	$(eval GOARCH=amd64)
 	# CGO_ENABLED=1 CC=${MINGW} 
-	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${ZSTD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${ZSTD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS}.exe ${SRC}
 
 windows32:
 	$(eval GOOS=windows)
 	$(eval GOARCH=386)
-	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+	GOOS=${GOOS} GOARCH=${GOARCH} ${BUILD} ${WIN_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS}.exe ${SRC}
 
 macos64:
 	$(eval GOOS=darwin)

@@ -1,5 +1,11 @@
 {
-    "username": "proxyuser",
-    "host": "10.10.14.12", 
+  "ssh": {
+    "username": "mismatchedsocks",
+    "host": "10.288.23.12",
     "port": 22
+  },
+  "socks": {
+    "local": "127.0.0.1:1080",
+    "remote": "127.0.0.1:1080"
+  }
 }
