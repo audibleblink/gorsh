@@ -154,7 +154,7 @@ func init() {
 func Route(argv []string) string {
 	cmd := _find(argv[0])
 	if cmd == nil {
-		return "command not found. Try 'help' for a list of available commands"
+		return "Command not found. Try 'help' for a list of available commands"
 	}
 
 	if cmd.ArgReq && cmd.ArgCount != len(argv)-1 {
