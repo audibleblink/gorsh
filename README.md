@@ -3,7 +3,7 @@
 [go]lang [r]everse [sh]ell
 
 ![](https://i.imgur.com/x51XH6K.png)
-![](https://i.imgur.com/pvCmHYa.png)
+![](https://i.imgur.com/1DhRJog.png)
 
 Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 
