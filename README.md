@@ -66,10 +66,10 @@ $ make all LHOST=example.com LPOST=443
 #### Catching the shell
 
 The `make listen` target kicks off a tmux session and creates new windows with each new connection.
-Feed it a port number as LPORT.
+Feed it a port number as PORT.
 
 ```sh
-make listen LPORT=8080
+make listen PORT=8080
 
 # once a client connects
 tmux attach -t GORSH
