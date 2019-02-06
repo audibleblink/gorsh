@@ -338,12 +338,12 @@ func tree(root, indent, result string) string {
 	}
 
 	for i, name := range names {
-		add := "│  "
+		add := "│   "
 		if i == len(names)-1 {
-			fmt.Printf(indent + "└──")
-			add = "   "
+			fmt.Printf(indent + "└── ")
+			add = "    "
 		} else {
-			fmt.Printf(indent + "├──")
+			fmt.Printf(indent + "├── ")
 		}
 
 		tree(filepath.Join(root, name), indent+add, result)
