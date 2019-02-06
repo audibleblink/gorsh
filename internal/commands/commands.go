@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/audibleblink/HoleySocks/pkg/holeysocks"
 	"github.com/audibleblink/gorsh/internal/directory"
@@ -72,6 +73,13 @@ func init() {
 			ArgCount: 0,
 			ArgReq:   false,
 			cmdFn:    envFn},
+		&command{
+			Name:     "tree",
+			ArgHint:  "[path]",
+			Desc:     "Recursively list directory contents",
+			ArgCount: 1,
+			ArgReq:   false,
+			cmdFn:    treeFn},
 		&command{
 			Name:     "cd",
 			ArgHint:  "[path]",
@@ -295,6 +303,52 @@ func helpFn(args ...string) string {
 		output += fmt.Sprintf(cmd.Help())
 	}
 	return output
+}
+
+func treeFn(args ...string) string {
+	path := strings.Join(args[1:], " ")
+	if len(args) == 1 {
+		path = "."
+	}
+
+	return tree(path, "", "")
+}
+
+func tree(root, indent, result string) string {
+	fi, err := os.Stat(root)
+	if err != nil {
+		return fmt.Sprintf("could not stat %s: %v", root, err.Error())
+	}
+
+	fmt.Println(fi.Name())
+	if !fi.IsDir() {
+		return ""
+	}
+
+	fis, err := ioutil.ReadDir(root)
+	if err != nil {
+		return fmt.Sprintf("could not read dir %s: %v", root, err.Error())
+	}
+
+	var names []string
+	for _, fi := range fis {
+		if fi.Name()[0] != '.' {
+			names = append(names, fi.Name())
+		}
+	}
+
+	for i, name := range names {
+		add := "│  "
+		if i == len(names)-1 {
+			fmt.Printf(indent + "└──")
+			add = "   "
+		} else {
+			fmt.Printf(indent + "├──")
+		}
+
+		tree(filepath.Join(root, name), indent+add, result)
+	}
+	return result
 }
 
 func _handleGlob(path string, cb genFunc) (string, error) {
