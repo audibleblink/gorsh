@@ -31,7 +31,7 @@ type writer interface {
 }
 
 func send(conn writer, msg string) {
-	conn.Write([]byte("\n"))
+	// conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
 }
@@ -48,6 +48,8 @@ func startShell(conn writer) {
 	for scanner.Scan() {
 		command := scanner.Text()
 		switch command {
+		case "":
+			send(conn, "")
 		case "exit":
 			os.Exit(0)
 		case "shell":

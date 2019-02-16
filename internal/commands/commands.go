@@ -317,38 +317,37 @@ func treeFn(args ...string) string {
 func tree(root, indent, result string) string {
 	fi, err := os.Stat(root)
 	if err != nil {
-		return fmt.Sprintf("could not stat %s: %v", root, err.Error())
+		return fmt.Sprintf("could not stat %s: %v\n", root, err.Error())
 	}
 
-	fmt.Println(fi.Name())
 	if !fi.IsDir() {
 		return ""
 	}
 
 	fis, err := ioutil.ReadDir(root)
 	if err != nil {
-		return fmt.Sprintf("could not read dir %s: %v", root, err.Error())
+		return fmt.Sprintf("could not read dir %s: %v\n", root, err.Error())
 	}
 
 	var names []string
 	for _, fi := range fis {
-		if fi.Name()[0] != '.' {
-			names = append(names, fi.Name())
-		}
+		names = append(names, fi.Name())
 	}
 
+	var out string
 	for i, name := range names {
-		add := "│   "
+		var add string
 		if i == len(names)-1 {
-			fmt.Printf(indent + "└── ")
+			out += fmt.Sprintf("%s└── %s\n", indent, name)
 			add = "    "
 		} else {
-			fmt.Printf(indent + "├── ")
+			out += fmt.Sprintf("%s├── %s\n", indent, name)
+			add = "│   "
 		}
 
-		tree(filepath.Join(root, name), indent+add, result)
+		out += tree(filepath.Join(root, name), indent+add, result)
 	}
-	return result
+	return out
 }
 
 func _handleGlob(path string, cb genFunc) (string, error) {
