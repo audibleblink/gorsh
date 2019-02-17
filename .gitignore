@@ -1,4 +1,5 @@
 server.*
+!build/gorsh.c
 build
 id_*
 ssh.json
