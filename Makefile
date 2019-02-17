@@ -72,6 +72,7 @@ linux_arm:
 	${BUILD} ${ZSTD} ${LINUX_LDFLAGS} -o ${OUT}/${GOARCH}/${GOOS} ${SRC}
 
 windll:
+	@# https://stackoverflow.com/questions/40573401/building-a-dll-with-go-1-7
 	@cp cmd/gorsh/main.go ${OUT}/${NAME}.go
 	@sed -i '1 a import "C"' ${OUT}/${NAME}.go
 	@echo '//export Run' >> ${OUT}/${NAME}.go
