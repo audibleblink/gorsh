@@ -2,6 +2,7 @@ package directory
 
 import (
 	"code.cloudfoundry.org/bytefmt"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -26,8 +27,7 @@ func List(argv []string) (string, error) {
 		perms := f.Mode().String()
 		size := bytefmt.ByteSize(uint64(f.Size()))
 		modTime := f.ModTime().String()[0:19]
-		name := f.Name()
-		details = details + perms + "\t" + modTime + "\t" + size + "\t" + name + "\n"
+		details = fmt.Sprintf("%s%s\t%s\t%s\t%s\n", details, perms, modTime, size, f.Name())
 	}
 
 	return details, err
