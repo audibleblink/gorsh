@@ -137,6 +137,13 @@ func init() {
 			ArgReq:   true,
 			cmdFn:    base64Fn},
 		&command{
+			Name:     "cp",
+			ArgHint:  "<src> <dst>",
+			Desc:     "Copies files. UNC supported on Windows",
+			ArgCount: 2,
+			ArgReq:   true,
+			cmdFn:    cpFn},
+		&command{
 			Name:     "fetch",
 			ArgHint:  "<URI> <file>",
 			Desc:     "Fetch stuff. http[s]:// or //share/folder (Windows only)",
@@ -267,6 +274,16 @@ func base64Fn(file ...string) string {
 
 func fetchFn(file ...string) string {
 	bytes, err := fetch.Get(file[1], file[2])
+	if err != nil {
+		return err.Error()
+	}
+	output := fmt.Sprintf("%d bytes copied to %s",
+		bytes, file[1])
+	return output
+}
+
+func cpFn(file ...string) string {
+	bytes, err := fetch.Copy(file[1], file[2])
 	if err != nil {
 		return err.Error()
 	}
