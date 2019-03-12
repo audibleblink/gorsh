@@ -1,4 +1,5 @@
 server.*
+certs
 !build/gorsh.c
 build
 id_*

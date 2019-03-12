@@ -6,13 +6,12 @@ import (
 	"io/ioutil"
 )
 
-func List(argv []string) (string, error) {
+func List(argv string) (string, error) {
 	var path string
 
-	if len(argv) < 2 {
+	path = argv
+	if argv == "" {
 		path = "./"
-	} else {
-		path = argv[1]
 	}
 
 	files, err := ioutil.ReadDir(path)

