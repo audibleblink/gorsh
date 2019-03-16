@@ -1,5 +1,20 @@
 Changes after fork:
 
+[15 Mar 19]
+
+* agent re-writen to use ishell for easier command additions and tab-completion
+* addition of tty-capable lister that provides emacs movements and other readline capabilities
+* vi-mode cli editing
+* tab-completion
+* reworks the tmux workflow to use the gorsh-listener
+* use unix sockets to receive plaintext comms from agents when running behind a reverse proxy
+* `env` command expanded to also set variables
+* `spawn` command creates a new shell for redundancy
+* `cp` added
+* converted `shell` to a non-interactive,  one-off code executer
+
+
+[older]
 * Added a reverse SOCKS5 proxy over ssh. Configure in `configs/ssh.json`
 * Uses tmux as a pseudo-C2-like interface, creating a new window with each agent callback
 * zipcat: zip > base64 > cat for data small/medium data exfil (zstd/x64 or gzip/x86)

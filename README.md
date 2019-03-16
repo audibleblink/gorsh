@@ -2,6 +2,9 @@
 
 [go]lang [r]everse [sh]ell
 
+[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-crayons.svg)](https://forthebadge.com)
+
 ![](https://i.imgur.com/x51XH6K.png)
 ![](https://i.imgur.com/1DhRJog.png)
 
@@ -15,7 +18,7 @@ Learn about host-based OPSEC considerations when writing an implant.
 
 ## Fork Changes
 
-**Require go1.11+**
+**Requires go1.11+**
 
 See the [Changelog](./docs/CHANGELOG.md)
 
@@ -28,7 +31,8 @@ with Go and setting up your Golang environment (with the `$GOPATH` environment v
 ```bash
 go get -u github.com/gobuffalo/packr/packr
 go get github.com/audibleblink/gorsh/...
-cd $GOPATH/src/github.com/audibleblink/gorsh
+git clone git@github.com:audibleblink/gorsh.git
+cd gorsh
 ```
 
 Makefile assumes this project is being built on Linux.
@@ -47,7 +51,7 @@ First, generate your certs and ssh keys for the reverse proxy.
 $ make depends
 ```
 
-If you want to use `socks` feature, edit `configs/ssh.json`. Create a user on the SSH server
+If you want to use the `socks` feature, edit `configs/ssh.json`. Create a user on the SSH server
 and give it a `/bin/false` shell in `/etc/passwd`
 
 For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
@@ -65,19 +69,39 @@ $ make all LHOST=example.com LPOST=443
 
 #### Catching the shell
 
+This project ships with a server that catches the reverse shell and still provides shell-like
+capabilities you lose with traditional reverse shells, including:
+
+* Tab Completion
+* Vi-mode readline editing
+* History
+* Cursor movements
+
+Generate the server with:
+
+```sh
+make server
+build/srv/gorsh-listen --help
+```
+
+The gorsh-listener is a one-to-one relationship, like a traditional shell. For multiple shell, you
+need to start multiple server on different ports. 
+
+To have the ability to receive multiple shell on the same port, there's the `make listen` target
+
 The `make listen` target kicks off a tmux session and creates new windows with each new connection.
-Feed it a port number as PORT.
+Feed it a port number as PORT. It does this by having `socat` act as a TLS-terminating reverse
+proxy. The connections are then handed off to gorsh-listener through randomly generated Unix Domain
+Sockets.
 
 ```sh
 make listen PORT=8080
 
-# once a client connects
+# once a client connects, on a different terminal type:
 tmux attach -t GORSH
 ```
 
-If your `socat` has been compiled with `READLINE` support, you get command history for free.
-
-Shells can also be caught without tmux using:
+Shells can also be caught without tmux or gorsh-listen using:
 
 * socat (not working on macos)
 * ncat
