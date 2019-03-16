@@ -1,7 +1,6 @@
 package main
 
 import (
-	// "bufio"
 	"bytes"
 	"crypto/sha256"
 	"crypto/tls"

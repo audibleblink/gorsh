@@ -3,7 +3,6 @@ package cmds
 import (
 	"github.com/abiosoft/ishell"
 	"os/exec"
-	"strings"
 	// TODO make this work again through iShell, for now just execute cmds
 	// "github.com/audibleblink/gorsh/internal/shell"
 )
