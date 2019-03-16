@@ -22,6 +22,12 @@ func RegisterCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
+		Name: "..",
+		Help: "Shortcut for cd ..",
+		Func: CdUp,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
 		Name:      "cp",
 		Help:      "cp <source> <dest>",
 		LongHelp:  "Copies files. UNC paths are supported on Windows",

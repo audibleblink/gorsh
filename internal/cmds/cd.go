@@ -42,3 +42,9 @@ func CompCd(s []string) []string {
 	}
 	return dirs
 }
+
+func CdUp(c *ishell.Context) {
+	os.Chdir("..")
+	dir, _ := os.Getwd()
+	c.Printf("Current Directory: %s\n\n", dir)
+}
