@@ -7,6 +7,11 @@ import (
 )
 
 func Cp(c *ishell.Context) {
+	if len(c.Args) != 2 {
+		c.Println("Usage: cp <src> <dst>")
+		return
+	}
+
 	from, to := c.Args[0], c.Args[1]
 	bytes, err := fetch.Copy(from, to)
 	if err != nil {
