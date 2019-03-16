@@ -28,6 +28,12 @@ func RegisterCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
+		Name: "id",
+		Help: "Shows current user data",
+		Func: Id,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
 		Name:      "cp",
 		Help:      "cp <source> <dest>",
 		LongHelp:  "Copies files. UNC paths are supported on Windows",
