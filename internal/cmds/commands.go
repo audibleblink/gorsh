@@ -35,6 +35,7 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:      "cp",
+		Aliases:   []string{"copy"},
 		Help:      "cp <source> <dest>",
 		LongHelp:  "Copies files. UNC paths are supported on Windows",
 		Func:      Cp,
@@ -43,6 +44,7 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:      "cat",
+		Aliases:   []string{"type"},
 		Help:      "cat [file]",
 		LongHelp:  "Print out the contents of a file",
 		Func:      Cat,
