@@ -17,8 +17,7 @@ func Shell(c *ishell.Context) {
 	if len(c.Args) == 1 {
 		cmd = exec.Command(c.Args[0])
 	} else {
-		argv := strings.Join(c.Args[1:], " ")
-		cmd = exec.Command(c.Args[0], argv)
+		cmd = exec.Command(c.Args[0], c.Args[1:]...)
 	}
 
 	output, err := cmd.CombinedOutput()
