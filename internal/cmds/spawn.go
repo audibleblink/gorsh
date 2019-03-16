@@ -1,7 +1,6 @@
 package cmds
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -24,10 +23,18 @@ func Spawn(c *ishell.Context) {
 		return
 	}
 
-	argv := strings.Join(c.Args, " ")
-	connInfo := strings.Split(argv, ":")
+	var cmd *exec.Cmd
+	if len(c.Args) > 0 {
+		argv := strings.Join(c.Args, " ")
+		cmd = exec.Command(p, "--connect", argv)
+	} else {
+		cmd = exec.Command(p)
+	}
 
-	spawnArgs := fmt.Sprintf("--host %s --port %s", connInfo[0], connInfo[1])
-	cmd := exec.Command(p, spawnArgs)
-	cmd.Start()
+	err = cmd.Start()
+	if err != nil {
+		c.Println(err.Error())
+	} else {
+		c.Println("Spawn command completed")
+	}
 }
