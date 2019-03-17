@@ -118,4 +118,9 @@ macos32:
 clean:
 	rm -rf certs ${OUT} configs/id_*
 
+enumscripts:
+	@echo Updating Enum Scripts
+	bash scripts/prepare_enum_scripts.sh
+
+
 .PHONY: linux64 windows64 macos64 linux32 macos32 windows32 clean listen linux_arm linux_arm64 servers listen-socat
