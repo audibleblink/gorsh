@@ -11,20 +11,21 @@ import (
 )
 
 func Enum(c *ishell.Context) {
-	if len(c.Args) != 1 {
-		c.Println("Usage: enum <scriptName>")
-		return
-	}
-
 	var script string
 	var err error
 
-	switch c.Args[0] {
-	case "sherlock":
+	choice := c.MultiChoice([]string{
+		"sherlock",
+		"jaws",
+		"powerup",
+	}, "Run which script?")
+
+	switch choice {
+	case 0:
 		script, err = enum.Sherlock().UTF16LEB64()
-	case "jaws":
+	case 1:
 		script, err = enum.Jaws().UTF16LEB64()
-	case "powerup":
+	case 2:
 		script, err = enum.PowerUp().UTF16LEB64()
 	}
 	if err != nil {
@@ -42,14 +43,6 @@ func Enum(c *ishell.Context) {
 	}
 	c.ProgressBar().Stop()
 	c.Println(string(out))
-}
-
-func CompEnum([]string) []string {
-	return []string{
-		"jaws",
-		"powerup",
-		"sherlock",
-	}
 }
 
 func execute(b64Script string) ([]byte, error) {

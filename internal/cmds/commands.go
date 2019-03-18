@@ -5,11 +5,9 @@ import "github.com/abiosoft/ishell"
 func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
-		Name:      "enum",
-		Help:      "enum <scriptName>",
-		LongHelp:  "Run builtin versions of popular enumeration scripts. Type `enum <TAB>` for a list of available scripts for this OS",
-		Func:      Enum,
-		Completer: CompEnum,
+		Name: "enum",
+		Help: "Choose an embeded enumeration script",
+		Func: Enum,
 	})
 
 	sh.AddCmd(&ishell.Cmd{
