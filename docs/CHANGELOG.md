@@ -1,5 +1,10 @@
 Changes after fork:
 
+[18 Mar 19]
+* adds enumeration module with OS-specific scripts
+    - Linux: LinEnum by @rebootuser
+    - Windows: PowerUp, JAWS, Sherlock
+
 [15 Mar 19]
 
 * `spawn` command creates a new shell for redundancy
@@ -8,11 +13,11 @@ Changes after fork:
 * addition of tty-capable lister that provides emacs movements and other readline capabilities
 * vi-mode cli editing
 * tab-completion
-* reworks the tmux workflow to use the gorsh-listener
+* reworks the tmux workflow to use the new gorsh-listener
 * use unix sockets to receive plaintext comms from agents when running behind a reverse proxy
 * `env` command expanded to also set variables
 * `cp` added
-* converted `shell` to a non-interactive,  one-off code executer
+* converted `shell` to a non-interactive,  one-off code executor
 
 
 [older]
