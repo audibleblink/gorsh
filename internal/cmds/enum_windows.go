@@ -71,7 +71,6 @@ func execute(b64Script string) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	fmt.Println(pshell64)
 	args := []string{
 		"-nOp",
 		"-ep",
