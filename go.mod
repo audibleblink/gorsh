@@ -21,4 +21,5 @@ require (
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
 	github.com/sirupsen/logrus v1.3.0
 	github.com/valyala/gozstd v1.2.1
+	golang.org/x/text v0.3.0
 )
