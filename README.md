@@ -67,6 +67,13 @@ $ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
 $ make all LHOST=example.com LPOST=443
 ```
 
+### Enumeration Scripts
+
+The `enum` command will present a selection dialog that allows once to run enumeration scripts based
+on the host OS. You can update scripts in `scripts/prepare_enum_scripts.sh` and run 
+`make enumscripts`. Addition of scripts will require modification of
+`./internal/enum/enum_{windows,linux}.go`
+
 [Troubleshooting](./docs/TROUBLESHOOTING.md)
 
 
