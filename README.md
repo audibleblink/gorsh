@@ -9,7 +9,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-crayons.svg)](https://forthebadge.com)
 
 ![](https://i.imgur.com/x51XH6K.png)
-![](https://i.imgur.com/1DhRJog.png)
+[![asciicast](https://asciinema.org/a/NmeC42TNu8BgdjMLcyVUXo74x.svg)](https://asciinema.org/a/NmeC42TNu8BgdjMLcyVUXo74x)
 
 Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 

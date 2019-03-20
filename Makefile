@@ -19,7 +19,10 @@ LHOST ?= 127.0.0.1
 LPORT ?= 8443
 STRIP=-s -w
 LINUX_LDFLAGS=-ldflags "${STRIP} -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
-WIN_LDFLAGS=-ldflags "${STRIP} -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT} -H windowsgui"
+
+#TODO: Figure out why tab completion breaks when using -H windowsgui
+# WIN_LDFLAGS=-ldflags "${STRIP} -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT} -H windowsgui"
+WIN_LDFLAGS=-ldflags "${STRIP} -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 
 MINGW=x86_64-w64-mingw32-gcc
 CXX=x86_64-w64-mingw32-g++
