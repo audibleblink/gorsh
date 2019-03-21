@@ -62,7 +62,7 @@ listen-socat:
 listen:
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh
 
-servers:
+server:
 	GOOS=linux GOARCH=amd64 \
 	${BUILD} ${LINUX_LDFLAGS} -o ${OUT}/srv/${SRVR} ${SRV_SRC}
 
