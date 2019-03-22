@@ -92,10 +92,11 @@ windll:
 	@sed -i '1 a import "C"' ${OUT}/${NAME}.go
 	@echo '//export Run' >> ${OUT}/${NAME}.go
 	@echo 'func Run() { main() }' >> ${OUT}/${NAME}.go
+	cp scripts/gorsh.c ${OUT}/
 
 	CGO_ENABLED=1 CC=${MINGW} CXX=${CXX} GOOS=windows GOARCH=amd64 \
 	${BUILD} ${LINUX_LDFLAGS} ${ZSTD} -buildmode=c-archive -o ${OUT}/${NAME}.a ${OUT}/${NAME}.go
-	${MINGW} -shared -pthread -o ${OUT}/${NAME}.dll scripts/${NAME}.c ${OUT}/${NAME}.a -lwinmm -lntdll -lws2_32
+	${MINGW} -shared -pthread -o ${OUT}/${NAME}.dll ${OUT}/${NAME}.c ${OUT}/${NAME}.a -lwinmm -lntdll -lws2_32
 
 windows64:
 	$(eval GOOS=windows)
