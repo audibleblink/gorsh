@@ -10,39 +10,35 @@ import (
 	"github.com/audibleblink/gorsh/internal/enum"
 )
 
-func Enum(c *ishell.Context) {
-	var script string
-	var err error
+func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
+	sh.AddCmd(&ishell.Cmd{
+		Name: "sherlock",
+		Help: "github.com/rasta-mouse/linenum",
+		Func: enumFn(enum.Sherlock),
+	})
 
-	choice := c.MultiChoice([]string{
-		"sherlock",
-		"jaws",
-		"powerup",
-	}, "Run which script?")
+	sh.AddCmd(&ishell.Cmd{
+		Name: "jaws",
+		Help: "github.com/411hall/jaws",
+		Func: enumFn(enum.Jaws),
+	})
 
-	switch choice {
-	case 0:
-		script, err = enum.Sherlock().UTF16LEB64()
-	case 1:
-		script, err = enum.Jaws().UTF16LEB64()
-	case 2:
-		script, err = enum.PowerUp().UTF16LEB64()
-	}
-	if err != nil {
-		c.Println(err.Error())
-		return
-	}
+	sh.AddCmd(&ishell.Cmd{
+		Name: "powerup",
+		Help: "github.com/powershellmafia/powersploit",
+		Func: enumFn(enum.PowerUp),
+	})
+	return sh
+}
 
-	c.ProgressBar().Start()
-	out, err := execute(script)
-	if err != nil {
-		c.ProgressBar().Stop()
-		c.Println(out)
-		c.Println(err.Error())
-		return
+func enumFn(fn func() *enum.EnumScript) func(*ishell.Context) {
+	return func(c *ishell.Context) {
+		b64, err := fn().UTF16LEB64()
+		if err != nil {
+			c.Println(err.Error())
+		}
+		executeWithProgress(b64, c)
 	}
-	c.ProgressBar().Stop()
-	c.Println(string(out))
 }
 
 func execute(b64Script string) ([]byte, error) {

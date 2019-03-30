@@ -4,13 +4,11 @@ import "github.com/abiosoft/ishell"
 
 func RegisterCommands(sh *ishell.Shell) {
 
-	enumRoot := &ishell.Cmd{
+	sh.AddCmd(addSubEnumCmds(&ishell.Cmd{
 		Name: "enum",
-		Help: "Choose an embeded enumeration script",
+		Help: "Run an enumeration script",
 		Func: Enum,
-	}
-	addSubEnumCmds(enumRoot)
-	sh.AddCmd(enumRoot)
+	}))
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:      "ls",

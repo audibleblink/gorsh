@@ -13,19 +13,19 @@ func init() {
 	scripts = packr.NewBox("../../scripts")
 }
 
-type enumScript struct {
+type EnumScript struct {
 	Data []byte
 }
 
-func (e enumScript) String() string {
+func (e EnumScript) String() string {
 	return string(e.Data)
 }
 
-func (e enumScript) Base64() string {
+func (e EnumScript) Base64() string {
 	return base64.StdEncoding.EncodeToString(e.Data)
 }
 
-func (e enumScript) UTF16LEB64() (string, error) {
+func (e EnumScript) UTF16LEB64() (string, error) {
 	return ToUnicode(string(e.Data))
 }
 
