@@ -43,7 +43,7 @@ func tree(root, indent, result string) string {
 	for i, name := range names {
 		var add string
 		if i == len(names)-1 {
-			out += fmt.Sprintf("%sL__ %s\n", indent, name)
+			out += fmt.Sprintf("%s+-- %s\n", indent, name)
 			//BUG TODO these don't display well when sent over tcp
 			// out += fmt.Sprintf("%s└── %s\n", indent, name
 			add = "    "
