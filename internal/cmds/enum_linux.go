@@ -9,38 +9,33 @@ import (
 )
 
 func Enum(c *ishell.Context) {
-	var script string
-	var err error
+	c.Println("You are likely to be eaten by a grue.")
+}
 
-	choice := c.MultiChoice([]string{
-		"linenum",
-	}, "Run which script?")
+func addSubEnumCmds(sh *ishell.Cmd) {
+	sh.AddCmd(&ishell.Cmd{
+		Name: "linenum",
+		Help: "github.com/rebootuser/linenum",
+		Func: func(c *ishell.Context) {
+			b64 := enum.LinEnum().Base64()
+			executeWithProgress(b64, c)
+		},
+	})
+}
 
-	switch choice {
-	case 0:
-		script = enum.LinEnum().Base64()
-	default:
-		c.Println("You are likely to be eaten by a grue")
-		return
-	}
+func execute(scriptB64 string) ([]byte, error) {
+	cmd := fmt.Sprintf(" echo %s | base64 -d | bash", scriptB64)
+	return exec.Command("bash", "-c", cmd).Output()
+}
 
-	if err != nil {
-		c.Println(err.Error())
-		return
-	}
-
+func executeWithProgress(scriptB64 string, c *ishell.Context) {
 	c.ProgressBar().Start()
-	out, err := execute(script)
+	out, err := execute(scriptB64)
 	if err != nil {
 		c.ProgressBar().Stop()
 		c.Println(err.Error())
 		return
 	}
 	c.ProgressBar().Stop()
-	c.Println(string(out))
-}
-
-func execute(scriptB64 string) ([]byte, error) {
-	cmd := fmt.Sprintf(" echo %s | base64 -d | bash", scriptB64)
-	return exec.Command("bash", "-c", cmd).Output()
+	c.Println(out)
 }
