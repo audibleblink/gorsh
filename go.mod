@@ -12,14 +12,19 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/gobuffalo/packr v1.22.0
+	github.com/gobuffalo/packr v1.24.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/mattn/go-tty v0.0.0-20181127064339-e4f871175a2f
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
-	github.com/sirupsen/logrus v1.3.0
+	github.com/sirupsen/logrus v1.4.0
 	github.com/valyala/gozstd v1.2.1
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c // indirect
+	golang.org/x/net v0.0.0-20190328230028-74de082e2cca // indirect
+	golang.org/x/sys v0.0.0-20190329044733-9eb1bfa1ce65 // indirect
 	golang.org/x/text v0.3.0
 )
