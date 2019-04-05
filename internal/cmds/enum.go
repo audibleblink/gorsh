@@ -20,3 +20,13 @@ func executeWithProgress(scriptB64 string, c *ishell.Context) {
 	c.ProgressBar().Stop()
 	c.Println(string(out))
 }
+
+//stubs for GOOS without a need for these functions
+func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
+	return sh
+}
+
+//stubs for GOOS without a need for these functions
+func execute(scriptB64 string) ([]byte, error) {
+	return nil, nil
+}
