@@ -23,8 +23,6 @@ See the [Changelog](./docs/CHANGELOG.md)
 
 ```bash
 git clone git@github.com:audibleblink/gorsh.git
-cd gorsh
-go get -u github.com/gobuffalo/packr/packr
 ```
 
 **Be sure to read the Makefile**. It gives you a good idea of what's going on.
@@ -41,9 +39,12 @@ First, generate your certs and ssh keys for the reverse proxy.
 $ make depends
 ```
 
-Follow the make command's printed instructions on creating an ssh user for the reverse proxy connection.
+Follow the make command's printed instructions on creating an ssh user for the reverse proxy
+connection.
 
 **Create** `configs/ssh.json`. There's an example json file the `configs` directory.
+
+**RUN** `go generate` to generate code from static assets that will be embedded in the binary
 
 Generate agents with:
 

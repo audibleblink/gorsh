@@ -6,7 +6,7 @@ OUT=build
 SRV_KEY=certs/server.key
 SRV_PEM=certs/server.pem
 
-BUILD=packr build
+BUILD=go build
 
 AGNT=gorsh
 SRVR=gorsh-listen

@@ -1,7 +1,7 @@
+data.go
 server.*
 certs
 !build/gorsh.c
 build
 id_*
 ssh.json
-*-packr.go

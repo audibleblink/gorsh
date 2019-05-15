@@ -3,15 +3,18 @@ package sshocks
 import (
 	"encoding/json"
 
+	"github.com/audibleblink/gorsh/internal/utils"
+
 	"github.com/audibleblink/HoleySocks/pkg/holeysocks"
-	"github.com/gobuffalo/packr"
 )
 
-var Config holeysocks.MainConfig
+var (
+	Config holeysocks.MainConfig
+)
 
 func init() {
-	box := packr.NewBox("../../configs")
-	configBytes, err := box.Find("ssh.json")
+
+	configBytes, err := utils.GetBytes(configs, "ssh.json")
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +24,7 @@ func init() {
 		panic(err)
 	}
 
-	privKeyBytes, err := box.Find("id_ed25519")
+	privKeyBytes, err := utils.GetBytes(configs, "id_ed25519")
 	if err != nil {
 		panic(err)
 	}

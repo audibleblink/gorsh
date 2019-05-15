@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 powerup=https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/863699d97e55fe375fc67ada9e3d99d462cbe1d0/Privesc/PowerUp.ps1
 jaws=https://raw.githubusercontent.com/belane/JAWS/88c8f21812de58a04f2a4874ea359356277ac089/jaws-enum.ps1
 sherlock=https://raw.githubusercontent.com/rasta-mouse/Sherlock/9f5be56ea2989c01e6ccf19de6b70e0fcd30a11c/Sherlock.ps1
