@@ -12,10 +12,8 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
-	github.com/gobuffalo/packr v1.24.1
-	github.com/gobuffalo/packr/v2 v2.1.0 // indirect
 	github.com/jessevdk/go-flags v1.4.0
-	github.com/kr/pty v1.1.4 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/mattn/go-tty v0.0.0-20181127064339-e4f871175a2f
@@ -23,9 +21,13 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
+	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
+	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd
 	github.com/sirupsen/logrus v1.4.1
 	github.com/valyala/gozstd v1.2.1
-	golang.org/x/crypto v0.0.0-20190404164418-38d8ce5564a5 // indirect
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 // indirect
-	golang.org/x/text v0.3.0
+	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
+	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
+	golang.org/x/sys v0.0.0-20190514135907-3a4b5fb9f71f // indirect
+	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20190514230902-921b34c7d07f // indirect
 )

@@ -3,14 +3,14 @@
 package enum
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/audibleblink/gorsh/internal/utils"
 )
 
-func LinEnum() *enumScript {
-	data, err := scripts.Find("linenum.sh")
+func LinEnum() *EnumScript {
+	bytes, err := utils.GetBytes(scripts, "linenum.sh")
 	if err != nil {
-		log.Error(err)
+		panic(err)
 	}
 
-	return &enumScript{Data: data}
+	return &EnumScript{Data: bytes}
 }

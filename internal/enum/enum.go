@@ -3,15 +3,8 @@ package enum
 import (
 	"encoding/base64"
 
-	"github.com/gobuffalo/packr"
 	"golang.org/x/text/encoding/unicode"
 )
-
-var scripts packr.Box
-
-func init() {
-	scripts = packr.NewBox("../../scripts")
-}
 
 type EnumScript struct {
 	Data []byte

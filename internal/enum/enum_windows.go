@@ -4,31 +4,33 @@ package enum
 
 import (
 	log "github.com/sirupsen/logrus"
+
+	"github.com/audibleblink/gorsh/internal/utils"
 )
 
 func Sherlock() *EnumScript {
-	data, err := scripts.Find("sherlock.ps1")
+	bytes, err := utils.GetBytes(scripts, "sherlock.ps1")
 	if err != nil {
 		log.Error(err)
 	}
 
-	return &EnumScript{Data: data}
+	return &EnumScript{Data: bytes}
 }
 
 func Jaws() *EnumScript {
-	data, err := scripts.Find("jaws.ps1")
+	bytes, err := utils.GetBytes(scripts, "jaws.ps1")
 	if err != nil {
 		log.Error(err)
 	}
 
-	return &EnumScript{Data: data}
+	return &EnumScript{Data: bytes}
 }
 
 func PowerUp() *EnumScript {
-	data, err := scripts.Find("powerup.ps1")
+	bytes, err := utils.GetBytes(scripts, "powerup.ps1")
 	if err != nil {
 		log.Error(err)
 	}
 
-	return &EnumScript{Data: data}
+	return &EnumScript{Data: bytes}
 }
