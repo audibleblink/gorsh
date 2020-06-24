@@ -234,7 +234,7 @@ function JAWS-ENUM {
     }
     if (($HKCU | test-path) -eq "True") 
     {
-        if (((Get-ItemProperty -Path $HKLM -Name AlwaysInstallElevated).AlwaysInstallElevated) -eq 1)
+        if (((Get-ItemProperty -Path $HKCU -Name AlwaysInstallElevated).AlwaysInstallElevated) -eq 1)
         {
             $output += "AlwaysInstallElevated enabled on this host!"
         }
