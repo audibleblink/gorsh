@@ -2,15 +2,11 @@
 
 package enum
 
-import (
-	"github.com/audibleblink/gorsh/internal/utils"
-)
+import _ "embed"
+
+//go:embed embed/linenum.sh
+var linEnum []byte
 
 func LinEnum() *EnumScript {
-	bytes, err := utils.GetBytes(scripts, "linenum.sh")
-	if err != nil {
-		panic(err)
-	}
-
-	return &EnumScript{Data: bytes}
+	return &EnumScript{Data: linEnum}
 }

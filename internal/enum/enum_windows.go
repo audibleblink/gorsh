@@ -2,35 +2,25 @@
 
 package enum
 
-import (
-	log "github.com/sirupsen/logrus"
+import _ "embed"
 
-	"github.com/audibleblink/gorsh/internal/utils"
-)
+//go:embed embed/sherlock.ps1
+var sherlock []byte
+
+//go:embed embed/jaws.ps1
+var jaws []byte
+
+//go:embed embed/powerup.ps1
+var powerUp []byte
 
 func Sherlock() *EnumScript {
-	bytes, err := utils.GetBytes(scripts, "sherlock.ps1")
-	if err != nil {
-		log.Error(err)
-	}
-
-	return &EnumScript{Data: bytes}
+	return &EnumScript{Data: sherlock}
 }
 
 func Jaws() *EnumScript {
-	bytes, err := utils.GetBytes(scripts, "jaws.ps1")
-	if err != nil {
-		log.Error(err)
-	}
-
-	return &EnumScript{Data: bytes}
+	return &EnumScript{Data: jaws}
 }
 
 func PowerUp() *EnumScript {
-	bytes, err := utils.GetBytes(scripts, "powerup.ps1")
-	if err != nil {
-		log.Error(err)
-	}
-
-	return &EnumScript{Data: bytes}
+	return &EnumScript{Data: powerUp}
 }

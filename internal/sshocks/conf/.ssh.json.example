@@ -1,0 +1,8 @@
+{
+  "ssh": {
+    "username": "sshuser",
+    "host": "1.2.3.4",
+    "port": 22
+  },
+  "socks": { "local": "127.0.0.1:1080" }
+}
