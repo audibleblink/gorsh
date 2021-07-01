@@ -4,3 +4,4 @@ certs
 build
 id_*
 ssh.json
+.vscode
