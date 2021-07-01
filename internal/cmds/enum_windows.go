@@ -28,6 +28,12 @@ func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
 		Help: "github.com/powershellmafia/powersploit",
 		Func: enumFn(enum.PowerUp),
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: "winPEAS",
+		Help: "github.com/carlospolop",
+		Func: enumFn(enum.WinPeas),
+	})
 	return sh
 }
 

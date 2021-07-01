@@ -1,7 +1,7 @@
 #!/bin/bash
 thorough=1
 #A script to enumerate local information from a Linux host
-version="version 0.95"
+version="version 0.982"
 #@rebootuser
 
 #help function
@@ -80,7 +80,7 @@ echo -e "\e[00m\n"
 }
 
 # useful binaries (thanks to https://gtfobins.github.io/)
-binarylist='nmap\|perl\|awk\|find\|bash\|sh\|man\|more\|less\|vi\|emacs\|vim\|nc\|netcat\|python\|ruby\|lua\|irb\|tar\|zip\|gdb\|pico\|scp\|git\|rvim\|script\|ash\|csh\|curl\|dash\|ed\|env\|expect\|ftp\|sftp\|node\|php\|rpm\|rpmquery\|socat\|strace\|taskset\|tclsh\|telnet\|tftp\|wget\|wish\|zsh\|ssh$\|ip$\|arp\|mtr'
+binarylist='aria2c\|arp\|ash\|awk\|base64\|bash\|busybox\|cat\|chmod\|chown\|cp\|csh\|curl\|cut\|dash\|date\|dd\|diff\|dmsetup\|docker\|ed\|emacs\|env\|expand\|expect\|file\|find\|flock\|fmt\|fold\|ftp\|gawk\|gdb\|gimp\|git\|grep\|head\|ht\|iftop\|ionice\|ip$\|irb\|jjs\|jq\|jrunscript\|ksh\|ld.so\|ldconfig\|less\|logsave\|lua\|make\|man\|mawk\|more\|mv\|mysql\|nano\|nawk\|nc\|netcat\|nice\|nl\|nmap\|node\|od\|openssl\|perl\|pg\|php\|pic\|pico\|python\|readelf\|rlwrap\|rpm\|rpmquery\|rsync\|ruby\|run-parts\|rvim\|scp\|script\|sed\|setarch\|sftp\|sh\|shuf\|socat\|sort\|sqlite3\|ssh$\|start-stop-daemon\|stdbuf\|strace\|systemctl\|tail\|tar\|taskset\|tclsh\|tee\|telnet\|tftp\|time\|timeout\|ul\|unexpand\|uniq\|unshare\|vi\|vim\|watch\|wget\|wish\|xargs\|xxd\|zip\|zsh'
 
 system_info()
 {
@@ -376,7 +376,9 @@ fi
 #current path configuration
 pathinfo=`echo $PATH 2>/dev/null`
 if [ "$pathinfo" ]; then
+  pathswriteable=`ls -ld $(echo $PATH | tr ":" " ")`
   echo -e "\e[00;31m[-] Path information:\e[00m\n$pathinfo" 
+  echo -e "$pathswriteable"
   echo -e "\n"
 fi
 
@@ -539,26 +541,26 @@ if [ ! "$defroute" ] && [ "$defrouteip" ]; then
 fi
 
 #listening TCP
-tcpservs=`netstat -antp 2>/dev/null`
+tcpservs=`netstat -ntpl 2>/dev/null`
 if [ "$tcpservs" ]; then
   echo -e "\e[00;31m[-] Listening TCP:\e[00m\n$tcpservs" 
   echo -e "\n"
 fi
 
-tcpservsip=`ss -t 2>/dev/null`
+tcpservsip=`ss -t -l -n 2>/dev/null`
 if [ ! "$tcpservs" ] && [ "$tcpservsip" ]; then
   echo -e "\e[00;31m[-] Listening TCP:\e[00m\n$tcpservsip" 
   echo -e "\n"
 fi
 
 #listening UDP
-udpservs=`netstat -anup 2>/dev/null`
+udpservs=`netstat -nupl 2>/dev/null`
 if [ "$udpservs" ]; then
   echo -e "\e[00;31m[-] Listening UDP:\e[00m\n$udpservs" 
   echo -e "\n"
 fi
 
-udpservsip=`ip -u 2>/dev/null`
+udpservsip=`ss -u -l -n 2>/dev/null`
 if [ ! "$udpservs" ] && [ "$udpservsip" ]; then
   echo -e "\e[00;31m[-] Listening UDP:\e[00m\n$udpservsip" 
   echo -e "\n"
@@ -738,25 +740,25 @@ if [ "$postgver" ]; then
 fi
 
 #checks to see if any postgres password exists and connects to DB 'template0' - following commands are a variant on this
-postcon1=`psql -U postgres template0 -c 'select version()' 2>/dev/null | grep version`
+postcon1=`psql -U postgres -w template0 -c 'select version()' 2>/dev/null | grep version`
 if [ "$postcon1" ]; then
   echo -e "\e[00;33m[+] We can connect to Postgres DB 'template0' as user 'postgres' with no password!:\e[00m\n$postcon1" 
   echo -e "\n"
 fi
 
-postcon11=`psql -U postgres template1 -c 'select version()' 2>/dev/null | grep version`
+postcon11=`psql -U postgres -w template1 -c 'select version()' 2>/dev/null | grep version`
 if [ "$postcon11" ]; then
   echo -e "\e[00;33m[+] We can connect to Postgres DB 'template1' as user 'postgres' with no password!:\e[00m\n$postcon11" 
   echo -e "\n"
 fi
 
-postcon2=`psql -U pgsql template0 -c 'select version()' 2>/dev/null | grep version`
+postcon2=`psql -U pgsql -w template0 -c 'select version()' 2>/dev/null | grep version`
 if [ "$postcon2" ]; then
   echo -e "\e[00;33m[+] We can connect to Postgres DB 'template0' as user 'psql' with no password!:\e[00m\n$postcon2" 
   echo -e "\n"
 fi
 
-postcon22=`psql -U pgsql template1 -c 'select version()' 2>/dev/null | grep version`
+postcon22=`psql -U pgsql -w template1 -c 'select version()' 2>/dev/null | grep version`
 if [ "$postcon22" ]; then
   echo -e "\e[00;33m[+] We can connect to Postgres DB 'template1' as user 'psql' with no password!:\e[00m\n$postcon22" 
   echo -e "\n"
@@ -826,7 +828,8 @@ echo -e "\e[00;31m[-] Can we read/write sensitive files:\e[00m" ; ls -la /etc/pa
 echo -e "\n" 
 
 #search for suid files
-findsuid=`find / -perm -4000 -type f -exec ls -la {} 2>/dev/null \;`
+allsuid=`find / -perm -4000 -type f 2>/dev/null`
+findsuid=`find $allsuid -perm -4000 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$findsuid" ]; then
   echo -e "\e[00;31m[-] SUID files:\e[00m\n$findsuid" 
   echo -e "\n"
@@ -838,28 +841,29 @@ if [ "$export" ] && [ "$findsuid" ]; then
 fi
 
 #list of 'interesting' suid files - feel free to make additions
-intsuid=`find / -perm -4000 -type f -exec ls -la {} \; 2>/dev/null | grep -w $binarylist 2>/dev/null`
+intsuid=`find $allsuid -perm -4000 -type f -exec ls -la {} \; 2>/dev/null | grep -w $binarylist 2>/dev/null`
 if [ "$intsuid" ]; then
   echo -e "\e[00;33m[+] Possibly interesting SUID files:\e[00m\n$intsuid" 
   echo -e "\n"
 fi
 
-#lists word-writable suid files
-wwsuid=`find / -perm -4007 -type f -exec ls -la {} 2>/dev/null \;`
+#lists world-writable suid files
+wwsuid=`find $allsuid -perm -4002 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$wwsuid" ]; then
   echo -e "\e[00;33m[+] World-writable SUID files:\e[00m\n$wwsuid" 
   echo -e "\n"
 fi
 
 #lists world-writable suid files owned by root
-wwsuidrt=`find / -uid 0 -perm -4007 -type f -exec ls -la {} 2>/dev/null \;`
+wwsuidrt=`find $allsuid -uid 0 -perm -4002 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$wwsuidrt" ]; then
   echo -e "\e[00;33m[+] World-writable SUID files owned by root:\e[00m\n$wwsuidrt" 
   echo -e "\n"
 fi
 
 #search for sgid files
-findsgid=`find / -perm -2000 -type f -exec ls -la {} 2>/dev/null \;`
+allsgid=`find / -perm -2000 -type f 2>/dev/null`
+findsgid=`find $allsgid -perm -2000 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$findsgid" ]; then
   echo -e "\e[00;31m[-] SGID files:\e[00m\n$findsgid" 
   echo -e "\n"
@@ -871,21 +875,21 @@ if [ "$export" ] && [ "$findsgid" ]; then
 fi
 
 #list of 'interesting' sgid files
-intsgid=`find / -perm -2000 -type f  -exec ls -la {} \; 2>/dev/null | grep -w $binarylist 2>/dev/null`
+intsgid=`find $allsgid -perm -2000 -type f  -exec ls -la {} \; 2>/dev/null | grep -w $binarylist 2>/dev/null`
 if [ "$intsgid" ]; then
   echo -e "\e[00;33m[+] Possibly interesting SGID files:\e[00m\n$intsgid" 
   echo -e "\n"
 fi
 
 #lists world-writable sgid files
-wwsgid=`find / -perm -2007 -type f -exec ls -la {} 2>/dev/null \;`
+wwsgid=`find $allsgid -perm -2002 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$wwsgid" ]; then
   echo -e "\e[00;33m[+] World-writable SGID files:\e[00m\n$wwsgid" 
   echo -e "\n"
 fi
 
 #lists world-writable sgid files owned by root
-wwsgidrt=`find / -uid 0 -perm -2007 -type f -exec ls -la {} 2>/dev/null \;`
+wwsgidrt=`find $allsgid -uid 0 -perm -2002 -type f -exec ls -la {} 2>/dev/null \;`
 if [ "$wwsgidrt" ]; then
   echo -e "\e[00;33m[+] World-writable SGID files owned by root:\e[00m\n$wwsgidrt" 
   echo -e "\n"
@@ -1223,6 +1227,14 @@ fi
 checkbashhist=`find /home -name .bash_history -print -exec cat {} 2>/dev/null \;`
 if [ "$checkbashhist" ]; then
   echo -e "\e[00;31m[-] Location and contents (if accessible) of .bash_history file(s):\e[00m\n$checkbashhist"
+  echo -e "\n"
+fi
+
+#any .bak files that may be of interest
+bakfiles=`find / -name *.bak -type f 2</dev/null`
+if [ "$bakfiles" ]; then
+  echo -e "\e[00;31m[-] Location and Permissions (if accessible) of .bak file(s):\e[00m"
+  for bak in `echo $bakfiles`; do ls -la $bak;done
   echo -e "\n"
 fi
 

@@ -17,6 +17,15 @@ func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
 			executeWithProgress(b64, c)
 		},
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: "linpeas",
+		Help: "github.com/carlospolop",
+		Func: func(c *ishell.Context) {
+			b64 := enum.LinPeas().Base64()
+			executeWithProgress(b64, c)
+		},
+	})
 	return sh
 }
 
