@@ -76,7 +76,7 @@ To have the ability to receive multiple shells on the same port, there's the `ma
 The `make listen` target kicks off a socat TLS pipe and creates new tmux windows with each new
 incoming connection.  Feed it a port number as PORT. 
 `socat` is essentially acting as a TLS-terminating reverse proxy. The incoming connections are then
-handed off to gorsh-listener through randomly generated Unix Domain Sockets.
+handed off to gorsh-server through randomly generated Unix Domain Sockets.
 
 ```sh
 make listen PORT=8080
@@ -85,7 +85,7 @@ make listen PORT=8080
 tmux attach -t GORSH
 ```
 
-Shells can also be caught without tmux or gorsh-listen using:
+Shells can also be caught without tmux or gorsh-server using:
 
 * socat (not working on macos)
 * ncat

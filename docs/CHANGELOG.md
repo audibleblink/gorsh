@@ -1,5 +1,13 @@
 Changes after fork:
 
+[01 Jul 21]
+* extract connection logic to `core` module
+* holeysocks case change and update 
+* semantic use of make targets and dependencies
+* adds shellcode target and dllmain code to Makefile
+* improve handling of cgo when opting in to zstd
+* replace vsfgen with native go embed (go1.16+)
+
 [18 Mar 19]
 * adds enumeration module with OS-specific scripts
     - Linux: LinEnum by @rebootuser
