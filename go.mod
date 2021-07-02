@@ -1,11 +1,13 @@
 module github.com/audibleblink/gorsh
 
+go 1.16
+
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20180906201452-2aa6f33b730c
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
-	github.com/audibleblink/HoleySocks v0.1.2
+	github.com/audibleblink/holeysocks v1.0.0
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
@@ -21,13 +23,12 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4 // indirect
-	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd
 	github.com/sirupsen/logrus v1.4.1
+	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/valyala/gozstd v1.2.1
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
 	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
 	golang.org/x/sys v0.0.0-20190514135907-3a4b5fb9f71f // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20190514230902-921b34c7d07f // indirect
+	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
