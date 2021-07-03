@@ -9,7 +9,7 @@ function finish () {
 }
 trap finish EXIT
 
-tmux set-hook -g session-created 'set remain-on-exit on'
+tmux set-hook -g after-new-window 'set remain-on-exit on'
 
 # Start tmux in the background, if needed
 tmux has-session -t "${NAME}" || tmux new-session -d -s "${NAME}"

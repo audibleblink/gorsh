@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/bash -xe
 
+NAME=GORSH
 SOCKDIR="$(mktemp -d)"
 SOCKF="${SOCKDIR}/usock"
-NAME=GORSH
 
 function finish () {
         rm -rf $SOCKDIR
