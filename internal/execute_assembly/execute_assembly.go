@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	clr "github.com/Ne0nd0g/go-clr"
+	"github.com/audibleblink/dllinquent"
 )
 
 //go:embed assemblies/*
@@ -87,6 +88,18 @@ func unzippedBytes(name string) (asmBytes []byte, err error) {
 
 	if len(asmBytes) == 0 {
 		err = fmt.Errorf("null read size for %s", name)
+	}
+	return
+}
+
+func HasAmsi() (hasAmsi bool, dll dllinquent.Result, err error) {
+	dll, err = dllinquent.FindInSelf("amsi.dll", "AmsiScanBuffer")
+	if err != nil {
+		return
+	}
+
+	if dll != (dllinquent.Result{}) {
+		hasAmsi = true
 	}
 	return
 }

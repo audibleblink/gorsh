@@ -63,6 +63,21 @@ func ChangePrompt(c *ishell.Context, module string) {
 	c.SetPrompt(fmt.Sprintf("[%s] %s > ", GetHostname(), module))
 }
 
+func Amsi(c *ishell.Context) {
+	hasAmsi, dll, err := execute_assembly.HasAmsi()
+	if err != nil {
+		c.Printf("failed to check for amsi: %v\n", err)
+		return
+	}
+
+	if hasAmsi {
+		c.Printf("amsi detected: %#v\n", dll)
+		return
+	}
+
+	c.Println("amsi not detected")
+}
+
 func GetHostname() string {
 	if hostname != "" {
 		return hostname

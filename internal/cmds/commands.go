@@ -183,4 +183,12 @@ func RegisterCommands(sh *ishell.Shell) {
 		Name: ".",
 		Func: ExecuteAssembly,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "amsi",
+		Help:     "Check for amsi",
+		LongHelp: "Enumerates all loaded Dlls in self, and prints Proc location if found",
+		Func:     Amsi,
+	})
+
 }
