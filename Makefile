@@ -26,6 +26,7 @@ else
 	CC=x86_64-w64-mingw32-gcc
 endif
 
+GARBLE = ${GOPATH}/bin/garble
 GODONUT = ${GOPATH}/bin/go-donut
 SOCAT = /usr/bin/socat
 
@@ -41,7 +42,7 @@ SOCAT = /usr/bin/socat
 all: $(PLATFORMS) server shellcode dll
 
 .PHONY: $(PLATFORMS)
-${PLATFORMS}: $(PKEY) $(SRV_KEY)
+${PLATFORMS}: $(SRV_KEY) $(GARBLE)
 	${ENV.${target}} \
 	GOOS=${target} ${BUILD} \
 		-buildmode pie \
@@ -86,41 +87,17 @@ dll:
 clean:
 	rm -rf ${OUT} ${PKEY}* certs/*
 
-.PHONY: scripts
-scripts:
-	@echo Updating Enum Scripts...
-	bash scripts/prepare_enum_scripts.sh
-
 
 ## Dependency Management
 
 $(GODONUT):
 	go get github.com/Binject/go-donut
 
+$(GARBLE):
+	go install mvdan.cc/garble@latest
+
 $(SOCAT):
 	sudo apt get install socat
-
-$(PKEY):
-	ssh-keygen -t ed25519 -f ${target} -N ''
-	@echo
-	@echo "================================================="
-	@echo "                 IMPORTANT"
-	@echo "================================================="
-	@echo
-	@echo "# The following creates a user with a /bin/false shell on the target ssh server."
-	@echo "# And appends the generated key to that user's authorized_keys file"
-	@echo
-	@echo "HDIR=/home/sshuser"
-	@echo "useradd -s /bin/false -m -d \$${HDIR} -N sshuser"
-	@echo "mkdir -p \$${HDIR}/.ssh"
-	@echo "cat <<EOF >> \$${HDIR}/.ssh/authorized_keys"
-	@echo "NO-X11-FORWARDING,PERMITOPEN=\"0.0.0.0:1080\" `cat ${target}.pub`"
-	@echo "EOF"
-	@echo
-	@echo "# If you know your target's public IP, you can also prepend the above with:"
-	@echo "FROM=<ip or hostname>"
-	@echo
-
 
 $(SRV_KEY) $(SRV_PEM) &:
 	openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
