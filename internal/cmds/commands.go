@@ -1,6 +1,11 @@
 package cmds
 
-import "github.com/abiosoft/ishell"
+import (
+	"strings"
+
+	"github.com/abiosoft/ishell"
+	"github.com/audibleblink/gorsh/internal/execute_assembly"
+)
 
 func RegisterCommands(sh *ishell.Shell) {
 
@@ -150,5 +155,32 @@ func RegisterCommands(sh *ishell.Shell) {
 		Help:     "inject <base64_shellcode>",
 		LongHelp: "Execute shellcode",
 		Func:     Inject,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "load",
+		Help:     "load <assemblyName>",
+		LongHelp: "Loads an assembly into the current process for later execution",
+		Func:     LoadAssembly,
+		Completer: func([]string) (ass []string) {
+			dirs, _ := execute_assembly.Assemblies.ReadDir("assemblies")
+			for _, fsEntry := range dirs {
+				base := strings.Split(fsEntry.Name(), ".")[0]
+				ass = append(ass, base)
+			}
+			return
+		},
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "unload",
+		Help:     "unload",
+		LongHelp: "Unload current assembly",
+		Func:     UnloadAssembly,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: ".",
+		Func: ExecuteAssembly,
 	})
 }

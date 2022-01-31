@@ -5,3 +5,5 @@ build
 id_*
 ssh.json
 .vscode
+*.exe
+*.exe.gz
