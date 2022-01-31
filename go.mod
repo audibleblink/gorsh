@@ -8,8 +8,8 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
-	github.com/audibleblink/dllinquent v0.0.1 // indirect
-	github.com/audibleblink/memutils v0.0.1 // indirect
+	github.com/audibleblink/dllinquent v0.0.1
+	github.com/audibleblink/memutils v0.0.2
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
@@ -29,6 +29,7 @@ require (
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/valyala/gozstd v1.2.1
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
+	golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
 	golang.org/x/text v0.3.3
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
