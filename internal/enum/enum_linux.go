@@ -10,10 +10,5 @@ var linEnum []byte
 //go:embed embed/linpeas.sh
 var linPeas []byte
 
-func LinEnum() *EnumScript {
-	return &EnumScript{Data: linEnum}
-}
-
-func LinPeas() *EnumScript {
-	return &EnumScript{Data: linPeas}
-}
+func LinEnum() *EnumScript { return &EnumScript{Data: linEnum} }
+func LinPeas() *EnumScript { return &EnumScript{Data: linPeas} }
