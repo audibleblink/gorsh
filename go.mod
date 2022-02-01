@@ -8,7 +8,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
 	github.com/abiosoft/ishell v2.0.0+incompatible
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
-	github.com/audibleblink/dllinquent v0.0.1
+	github.com/audibleblink/dllinquent v0.2.1
 	github.com/audibleblink/memutils v0.0.2
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect

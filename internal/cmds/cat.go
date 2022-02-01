@@ -9,7 +9,6 @@ import (
 	"github.com/abiosoft/ishell"
 )
 
-type cmdFunc func(...string) string
 type genFunc func(string) ([]byte, error)
 
 func Cat(c *ishell.Context) {

