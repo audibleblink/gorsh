@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"io/ioutil"
+	"unsafe"
 
 	clr "github.com/Ne0nd0g/go-clr"
 	"github.com/audibleblink/dllinquent"
@@ -94,23 +95,31 @@ func unzippedBytes(name string) (asmBytes []byte, err error) {
 	return
 }
 
-func HasAmsi() (hasAmsi bool, err error) {
-
-	toCheck := make(map[string][]string, 0)
-	toCheck["amsi.dll"] = []string{
-		"AmsiScanBuffer",
-		"AmsiScanString",
+func HasAmsi(fn string) (hasAmsi bool, err error) {
+	d1, err := dllinquent.FindInSelf("amsi.dll", fn)
+	if err != nil {
+		return
+	}
+	if d1 != (dllinquent.Dll{}) {
+		hasAmsi = true
 	}
 
-	for dl, funcs := range toCheck {
-		for _, fn := range funcs {
-			d, _ := dllinquent.FindInSelf(dl, fn)
-			if d != (dllinquent.Dll{}) {
-				hasAmsi = true
-			}
-		}
-
+	var stomp byte
+	err = memutils.ReadMemory(
+		windows.CurrentProcess(),
+		unsafe.Pointer(d1.FuncAddress),
+		unsafe.Pointer(&stomp),
+		1,
+	)
+	if err != nil {
+		err = fmt.Errorf("couldn't verify if previously unhooked, so maybe? : %w", err)
+		return
 	}
+
+	if stomp == 0xc3 {
+		hasAmsi = false
+	}
+
 	return
 }
 
@@ -118,7 +127,8 @@ func UnhookFunction(dllName, fn string) (dllOut dllinquent.Dll, err error) {
 	ret := []byte{0xc3}
 	dllOut, err = dllinquent.FindInSelf(dllName, fn)
 	if err != nil {
-		return dllOut, err
+		err = fmt.Errorf("dll list exhausted: %w", err)
+		return
 	}
 
 	me := windows.CurrentProcess()
