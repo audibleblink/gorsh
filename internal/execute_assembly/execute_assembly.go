@@ -4,6 +4,7 @@ import (
 	"compress/gzip"
 	"embed"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"unsafe"
 
@@ -97,6 +98,10 @@ func unzippedBytes(name string) (asmBytes []byte, err error) {
 
 func HasAmsi(fn string) (hasAmsi bool, err error) {
 	d1, err := dllinquent.FindInSelf("amsi.dll", fn)
+	if err == io.EOF {
+		err = nil
+		return
+	}
 	if err != nil {
 		return
 	}
