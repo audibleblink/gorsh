@@ -159,7 +159,7 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:     "load",
-		Help:     "load <assemblyName>",
+		Help:     "load [list] <assemblyName>",
 		LongHelp: "Loads an assembly into the current process for later execution",
 		Func:     LoadAssembly,
 		Completer: func([]string) (ass []string) {
@@ -181,14 +181,21 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name: ".",
+		Help: "Pass args to the currently enable assembly",
 		Func: ExecuteAssembly,
 	})
 
 	sh.AddCmd(&ishell.Cmd{
-		Name:     "amsi",
-		Help:     "Check for amsi",
-		LongHelp: "Enumerates all loaded Dlls in self, and prints Proc location if found",
-		Func:     Amsi,
+		Name:     "unhook",
+		Help:     "unhook < amsi | etw | dllname.FuncName >",
+		LongHelp: "Finds a module in the PEB and calls GetProcAddress. Then patches the base function address with a ret instruction.",
+		Func:     Unhook,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: "dlls",
+		Help: "Print loaded DLLs",
+		Func: ListDlls,
 	})
 
 }

