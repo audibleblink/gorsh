@@ -228,4 +228,40 @@ func UnRegisterDLL() { run() }
 //export WdsAbortBlackboa
 func WdsAbortBlackboa() { run() }
 
+// export DrvConvertDevMode
+func DrvConvertDevMode() { run() }
+
+//export DrvDeviceCapabilities
+func DrvDeviceCapabilities() { run() }
+
+//export DrvDevicePropertySheets
+func DrvDevicePropertySheets() { run() }
+
+//export DrvDocumentEvent
+func DrvDocumentEvent() { run() }
+
+//export DrvDriverEvent
+func DrvDriverEvent() { run() }
+
+//export DrvDocumentPropertySheets
+func DrvDocumentPropertySheets() { run() }
+
+//export DrvPrinterEvent
+func DrvPrinterEvent() { run() }
+
+//export DrvQueryColorProfile
+func DrvQueryColorProfile() { run() }
+
+//export DrvQueryJobAttributes
+func DrvQueryJobAttributes() { run() }
+
+//export DevQueryPrintEx
+func DevQueryPrintEx() { run() }
+
+//export DrvSplDeviceCaps
+func DrvSplDeviceCaps() { run() }
+
+//export DrvUpgradePrinter
+func DrvUpgradePrinter() { run() }
+
 func main() {}
