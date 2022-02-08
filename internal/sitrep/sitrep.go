@@ -30,6 +30,12 @@ func (p *Process) String() string {
 	return out
 }
 
+func (p *Process) ConciseString() string {
+	template := "%d %d\t%s\t%s %s"
+	out := fmt.Sprintf(template, p.PID, p.PPID, p.Owner, p.Name, p.Exe)
+	return out
+}
+
 type Host struct {
 	Hostname string
 	Procs    uint64
@@ -90,18 +96,6 @@ func SysInfo() string {
 	}
 	dir, _ := os.Getwd()
 	output += fmt.Sprintf("Current Directory: %s", dir)
-	return output
-}
-
-func Processes() string {
-	var output string
-	processes, err := ProcessInfo()
-	if err != nil {
-		return err.Error()
-	}
-	for _, process := range processes {
-		output += process.String()
-	}
 	return output
 }
 
