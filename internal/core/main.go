@@ -41,12 +41,17 @@ func StartShell(conn myconn.Writer) {
 	hostname, _ := os.Hostname()
 
 	sh := ishell.NewWithConfig(&readline.Config{
-		Prompt:      fmt.Sprintf("[%s]> ", hostname),
-		Stdin:       conn,
-		StdinWriter: conn,
-		Stdout:      conn,
-		Stderr:      conn,
-		VimMode:     true,
+		Prompt:              fmt.Sprintf("[%s]> ", hostname),
+		Stdin:               conn,
+		StdinWriter:         conn,
+		Stdout:              conn,
+		Stderr:              conn,
+		VimMode:             true,
+		ForceUseInteractive: true,
+		UniqueEditLine:      true,
+		// FuncIsTerminal:      func() bool { return true },
+		// FuncMakeRaw: func() error { return nil },
+		// FuncExitRaw: func() error { return nil },
 	})
 
 	cmds.RegisterCommands(sh)

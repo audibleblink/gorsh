@@ -77,6 +77,13 @@ func RegisterCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
+		Name:     "exec",
+		Help:     "exec <args>",
+		LongHelp: "Executes a oneoff command",
+		Func:     Exec,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
 		Name:      "tree",
 		Help:      "tree [dir]",
 		LongHelp:  "Recursively list directory contents",

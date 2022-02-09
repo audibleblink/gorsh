@@ -1,6 +1,3 @@
-//go:build windows || !linux || !darwin || !freebsd
-// +build windows !linux !darwin !freebsd
-
 package shell
 
 import (

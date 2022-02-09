@@ -1,29 +1,33 @@
 package cmds
 
 import (
+	"os"
+
 	"github.com/abiosoft/ishell"
-	"os/exec"
-	// TODO make this work again through iShell, for now just execute cmds
-	// "github.com/audibleblink/gorsh/internal/shell"
+	"github.com/audibleblink/gorsh/internal/shell"
 )
 
 func Shell(c *ishell.Context) {
+	cmd := shell.GetShell()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Run()
+}
+
+func Exec(c *ishell.Context) {
 	if len(c.Args) < 1 {
 		c.Println("Usage: shell <cmd> [args]")
 		return
 	}
 
-	var cmd *exec.Cmd
-	if len(c.Args) == 1 {
-		cmd = exec.Command(c.Args[0])
-	} else {
-		cmd = exec.Command(c.Args[0], c.Args[1:]...)
-	}
-
-	output, err := cmd.CombinedOutput()
+	cmd := shell.GetShell()
+	cmd.Args = append(cmd.Args, "-c")
+	cmd.Args = append(cmd.Args, c.Args...)
+	err := cmd.Start()
 	if err != nil {
 		c.Println(err.Error())
 		return
 	}
-	c.Println(string(output))
+	c.Printf("started %d\n", cmd.Process.Pid)
 }
