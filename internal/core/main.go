@@ -39,20 +39,26 @@ func InitReverseShell(connectString string, fingerprint []byte) {
 
 func StartShell(conn myconn.Writer) {
 	hostname, _ := os.Hostname()
+	conf := &readline.Config{
+		Prompt:      fmt.Sprintf("[%s]> ", hostname),
+		Stdin:       conn,
+		StdinWriter: conn,
+		Stdout:      conn,
+		Stderr:      conn,
+		VimMode:     true,
+		// UniqueEditLine:      true,
+	}
 
-	sh := ishell.NewWithConfig(&readline.Config{
-		Prompt:              fmt.Sprintf("[%s]> ", hostname),
-		Stdin:               conn,
-		StdinWriter:         conn,
-		Stdout:              conn,
-		Stderr:              conn,
-		VimMode:             true,
-		ForceUseInteractive: true,
-		UniqueEditLine:      true,
-		// FuncIsTerminal:      func() bool { return true },
-		// FuncMakeRaw: func() error { return nil },
-		// FuncExitRaw: func() error { return nil },
-	})
+	// use these option when connection is a reverse shell,
+	// otherwise these break when using -dev locally
+	if myconn.Conn != nil {
+		conf.ForceUseInteractive = true
+		conf.FuncIsTerminal = func() bool { return true }
+		conf.FuncMakeRaw = func() error { return nil }
+		conf.FuncExitRaw = func() error { return nil }
+	}
+
+	sh := ishell.NewWithConfig(conf)
 
 	cmds.RegisterCommands(sh)
 	myconn.Send(conn, sitrep.SysInfo())

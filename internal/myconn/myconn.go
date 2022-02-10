@@ -1,6 +1,8 @@
 package myconn
 
-var Conn Writer
+import "io"
+
+var Conn io.ReadWriteCloser
 
 type Writer interface {
 	Write(s []byte) (int, error)

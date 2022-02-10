@@ -70,9 +70,9 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:     "shell",
-		Aliases:  []string{"sh", "exec"},
-		Help:     "shell <args>",
-		LongHelp: "Executes a command on the underlying OS. Mind your OPSEC",
+		Aliases:  []string{"sh"},
+		Help:     "shell",
+		LongHelp: "Drop down to an interactive shell",
 		Func:     Shell,
 	})
 

