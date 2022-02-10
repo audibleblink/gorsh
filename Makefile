@@ -52,7 +52,7 @@ ${PLATFORMS}: $(SRV_KEY) $(GARBLE)
 		cmd/gorsh/main.go
 
 .PHONY: listen listen-socat
-listen listen-socat: $(SRV_KEY) $(SOCAT)
+listen: $(SRV_KEY) $(SOCAT)
 	@test -n "$(PORT)" || (echo "PORT not defined"; exit 1)
 	${SOCAT} -d \
 		OPENSSL-LISTEN:${PORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
@@ -85,13 +85,13 @@ dll:
 
 .PHONY: clean
 clean:
-	rm -rf ${OUT} ${PKEY}* certs/*
+	rm -rf ${OUT} certs/*
 
 
 ## Dependency Management
 
 $(GODONUT):
-	go get github.com/Binject/go-donut
+	go install github.com/Binject/go-donut@latest
 
 $(GARBLE):
 	go install mvdan.cc/garble@latest
