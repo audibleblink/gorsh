@@ -203,4 +203,11 @@ func RegisterCommands(sh *ishell.Shell) {
 		Help: "scan <ip | cidr> <22,80 | t100>",
 		Func: Scanner,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "demote",
+		Help:     "demote <pid>",
+		LongHelp: "Demote a process, stripping it of its permissions and integrity",
+		Func:     Demote,
+	})
 }
