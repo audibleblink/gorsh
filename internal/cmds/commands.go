@@ -1,5 +1,3 @@
-//go:build !windows
-
 package cmds
 
 import (
@@ -129,6 +127,7 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:     "fetch",
+		Aliases:  []string{"download"},
 		Help:     "fetch <url> <dest>",
 		LongHelp: "Download files over HTTP (and UNC on Windows)",
 		Func:     Fetch,

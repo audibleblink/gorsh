@@ -61,6 +61,7 @@ func StartShell(conn myconn.Writer) {
 	sh := ishell.NewWithConfig(conf)
 
 	cmds.RegisterCommands(sh)
+	cmds.RegisterWindowsCommands(sh)
 	myconn.Send(conn, sitrep.SysInfo())
 	sh.Run()
 	os.Exit(0)

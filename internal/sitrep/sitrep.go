@@ -68,6 +68,7 @@ type User struct {
 	Uid      string
 	Gid      string
 	Homedir  string
+	Token    string
 }
 
 func (u *User) String() string {
@@ -167,7 +168,7 @@ func UserInfo() (User, error) {
 	if err != nil {
 		return User{}, err
 	}
-	user := User{userData.Username, userData.Uid, userData.Gid, userData.HomeDir}
+	user := User{userData.Username, userData.Uid, userData.Gid, userData.HomeDir, ""}
 	return user, err
 }
 
