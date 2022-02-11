@@ -53,6 +53,14 @@ func RegisterCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
+		Name:      "mv",
+		Help:      "mv <source> <dest>",
+		LongHelp:  "Move / rename files",
+		Func:      Move,
+		Completer: CompLs,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
 		Name:      "cat",
 		Aliases:   []string{"type"},
 		Help:      "cat [file]",
