@@ -150,8 +150,17 @@ func RegisterCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
-		Name: "scan",
-		Help: "scan <ip | cidr> <22,80 | t100>",
-		Func: Scanner,
+		Name:     "scan",
+		Help:     "scan < ip|cidr > [ 250|500 ]",
+		LongHelp: "Ping sweep and TCP scan an IP or subnet. Live hosts only. Defaults to 250",
+		Func:     Scanner,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "pivot",
+		Help:     "pivot [ip:port]",
+		LongHelp: "Connect to a Liglo server to allow for proxying",
+		Func:     Pivot,
+	})
+
 }
