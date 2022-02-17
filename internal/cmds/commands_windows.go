@@ -79,6 +79,13 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 	})
 
 	sh.AddCmd(&ishell.Cmd{
+		Name:     "getsystem",
+		Help:     "getsystem",
+		LongHelp: "Steal winlogon token",
+		Func:     GetSystem,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
 		Name:     "revtoself",
 		Help:     "revtoself",
 		LongHelp: "Resume use of primary token",

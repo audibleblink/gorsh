@@ -28,3 +28,11 @@ func StealToken(c *ishell.Context) {
 func RevToSelf(c *ishell.Context) {
 	tokens.RevToSelf()
 }
+
+func GetSystem(c *ishell.Context) {
+	err := tokens.GetSystem()
+	if err != nil {
+		c.Printf("getsystem failed: %s\n", err)
+	}
+	c.Printf("you have the train\n", err)
+}
