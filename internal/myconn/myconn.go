@@ -2,7 +2,10 @@ package myconn
 
 import "io"
 
-var Conn io.ReadWriteCloser
+var (
+	Conn             io.ReadWriteCloser
+	ConnectionString string
+)
 
 type Writer interface {
 	Write(s []byte) (int, error)

