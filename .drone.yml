@@ -9,7 +9,7 @@ when:
 
 steps:
   - name: build
-    image: x1unix/go-mingw:1.17
+    image: audibleblink/go-mingw:1.17
     commands:
     - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > internal/execute_assembly/assemblies/rubeus.exe
     - make

