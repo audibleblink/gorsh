@@ -170,4 +170,11 @@ func RegisterCommands(sh *ishell.Shell) {
 		Func:     Pivot,
 	})
 
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "find",
+		Help:     "find <root> <pattern>",
+		LongHelp: "Look for a file name by regex pattern",
+		Func:     Find,
+	})
+
 }
