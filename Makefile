@@ -3,7 +3,6 @@ OUT = build
 
 SRV_KEY = certs/server.key
 SRV_PEM = certs/server.pem
-PKEY = internal/sshocks/conf/id_ed25519
 
 BUILD = go build -trimpath
 
@@ -12,6 +11,7 @@ target = $(word 1, $@)
 
 LHOST ?= 127.0.0.1
 LPORT ?= 8443
+PORT  ?= 8443
 
 FINGERPRINT = $(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
 LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
