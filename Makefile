@@ -18,7 +18,7 @@ LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${F
 
 GARBLE = ${GOPATH}/bin/garble
 GODONUT = ${GOPATH}/bin/go-donut
-SOCAT = /usr/bin/socat
+SOCAT = $(shell which socat)
 
 ifneq ($(UNAME), Windows)
 	DLLCC=x86_64-w64-mingw32-gcc
