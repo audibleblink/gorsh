@@ -100,5 +100,6 @@ $(SOCAT):
 	sudo apt get install socat
 
 $(SRV_KEY) $(SRV_PEM) &:
+	mkdir -p certs
 	openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
 	@cat ${SRV_KEY} >> ${SRV_PEM}
