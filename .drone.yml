@@ -3,7 +3,15 @@ type: docker
 name: default
 
 steps:
-- name: build
-  image: golang
-  commands:
-  - make all
+  - name: prepare assemblies
+    image: alpine
+    commands:
+    - apk add curl gzip
+    - mkdir internal/execute_assembly/assemblies/
+    - cd internal/execute_assembly/assemblies/
+    - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > rubeus.exe
+
+  - name: build
+    image: golang
+    commands:
+    - make
