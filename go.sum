@@ -49,6 +49,8 @@ github.com/jpillora/icmpscan v1.3.1/go.mod h1:GG0bW7l3z3Qiaeo489sh6z90haQVELliXI
 github.com/jpillora/ipmath v0.0.0-20180121110145-ebede80a2ab9 h1:n9NgEFCoGjtNDfJYAvU0RSx8+Qy0f6O6ODM2Ti++cyY=
 github.com/jpillora/ipmath v0.0.0-20180121110145-ebede80a2ab9/go.mod h1:YrEIesFvVICljkLCwfmyHNtzxn77M80G9IPZjme66h8=
 github.com/jpillora/opts v1.1.2/go.mod h1:7p7X/vlpKZmtaDFYKs956EujFqA6aCrOkcCaS6UBcR4=
+github.com/klauspost/compress v1.14.3 h1:DQv1WP+iS4srNjibdnHtqu8JNWCDMluj5NzPnFJsnvk=
+github.com/klauspost/compress v1.14.3/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=

@@ -32,6 +32,7 @@ require (
 	github.com/go-ping/ping v0.0.0-20210506233800-ff8be3320020 // indirect
 	github.com/jpillora/arp v0.0.0-20170204155840-96a8ba0be1a4 // indirect
 	github.com/jpillora/ipmath v0.0.0-20180121110145-ebede80a2ab9 // indirect
+	github.com/klauspost/compress v1.14.3 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/miekg/dns v1.1.26 // indirect
