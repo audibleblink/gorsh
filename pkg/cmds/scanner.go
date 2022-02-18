@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/scanner"
+	"git.hyrule.link/blink/gorsh/pkg/scanner"
 )
 
 func Scanner(c *ishell.Context) {

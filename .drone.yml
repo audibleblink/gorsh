@@ -11,7 +11,7 @@ steps:
   - name: build
     image: audibleblink/go-mingw:1.17.5
     commands:
-    - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > internal/execute_assembly/assemblies/rubeus.exe
+    - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > pkg/execute_assembly/assemblies/rubeus.exe
     - make
 
 image_pull_secrets:

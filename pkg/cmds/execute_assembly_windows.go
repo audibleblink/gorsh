@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/audibleblink/gorsh/internal/execute_assembly"
+	"git.hyrule.link/blink/gorsh/pkg/execute_assembly"
 
 	"github.com/abiosoft/ishell"
 )

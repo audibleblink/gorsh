@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/myconn"
-	"github.com/audibleblink/gorsh/internal/pivot"
+	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.hyrule.link/blink/gorsh/pkg/pivot"
 )
 
 func Pivot(c *ishell.Context) {

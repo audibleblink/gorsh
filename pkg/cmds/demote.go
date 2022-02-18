@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/demote"
+	"git.hyrule.link/blink/gorsh/pkg/demote"
 )
 
 func Demote(c *ishell.Context) {

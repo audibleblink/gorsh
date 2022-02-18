@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	"github.com/audibleblink/gorsh/internal/fetch"
+	"git.hyrule.link/blink/gorsh/pkg/fetch"
 
 	"github.com/abiosoft/ishell"
 )

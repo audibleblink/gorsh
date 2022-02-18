@@ -2,8 +2,8 @@ package cmds
 
 import (
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/myconn"
-	"github.com/audibleblink/gorsh/internal/shell"
+	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.hyrule.link/blink/gorsh/pkg/shell"
 )
 
 func Shell(c *ishell.Context) {

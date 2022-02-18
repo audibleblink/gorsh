@@ -5,7 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/enum"
+	"git.hyrule.link/blink/gorsh/pkg/enum"
 )
 
 func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/execute_assembly"
+	"git.hyrule.link/blink/gorsh/pkg/execute_assembly"
 )
 
 func RegisterWindowsCommands(sh *ishell.Shell) {

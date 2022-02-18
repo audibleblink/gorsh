@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/audibleblink/gorsh/internal/core"
-	"github.com/audibleblink/gorsh/internal/myconn"
+	"git.hyrule.link/blink/gorsh/pkg/core"
+	"git.hyrule.link/blink/gorsh/pkg/myconn"
 )
 
 const (

@@ -9,9 +9,9 @@ import (
 
 	"github.com/abiosoft/ishell"
 	"github.com/abiosoft/readline"
-	"github.com/audibleblink/gorsh/internal/cmds"
-	"github.com/audibleblink/gorsh/internal/myconn"
-	"github.com/audibleblink/gorsh/internal/sitrep"
+	"git.hyrule.link/blink/gorsh/pkg/cmds"
+	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.hyrule.link/blink/gorsh/pkg/sitrep"
 )
 
 const (

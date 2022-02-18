@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/abiosoft/ishell"
-	"github.com/audibleblink/gorsh/internal/sitrep"
+	"git.hyrule.link/blink/gorsh/pkg/sitrep"
 )
 
 func Ps(c *ishell.Context) {

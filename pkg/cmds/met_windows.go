@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	"github.com/audibleblink/gorsh/internal/meterpreter"
+	"git.hyrule.link/blink/gorsh/pkg/meterpreter"
 
 	"github.com/abiosoft/ishell"
 )
