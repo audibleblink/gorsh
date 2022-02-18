@@ -1,18 +1,23 @@
 type: docker
 kind: pipeline
 name: default
-when:
-  branch:
-    - main
-  event:
-    - push
 
 steps:
   - name: build
     image: audibleblink/go-mingw:1.17.5
+    when:
+      branch:
+        - main
     commands:
     - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > pkg/execute_assembly/assemblies/rubeus.exe
     - make
+
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
 
 image_pull_secrets:
 - docker_registry_auth
