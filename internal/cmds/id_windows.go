@@ -1,8 +1,6 @@
 package cmds
 
 import (
-	"runtime"
-
 	"github.com/abiosoft/ishell"
 	"github.com/audibleblink/getsystem"
 	"github.com/audibleblink/gorsh/internal/sitrep"
