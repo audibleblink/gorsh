@@ -1,17 +1,18 @@
-kind: pipeline
 type: docker
+kind: pipeline
 name: default
+when:
+  branch:
+    - main
+  event:
+    - push
 
 steps:
-  - name: prepare assemblies
-    image: alpine
-    commands:
-    - apk add curl gzip
-    - mkdir internal/execute_assembly/assemblies/
-    - cd internal/execute_assembly/assemblies/
-    - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > rubeus.exe
-
   - name: build
-    image: golang
+    image: x1unix/go-mingw:1.17
     commands:
+    - curl https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.0_Any/Rubeus.exe > internal/execute_assembly/assemblies/rubeus.exe
     - make
+
+image_pull_secrets:
+- docker_registry_auth

