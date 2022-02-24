@@ -7,3 +7,5 @@ ssh.json
 .vscode
 *.exe
 *.exe.gz
+.docker/data/*
+docker-compose.yml
