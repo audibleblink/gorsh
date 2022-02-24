@@ -127,7 +127,6 @@ func RegisterCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:     "fetch",
-		Aliases:  []string{"download"},
 		Help:     "fetch <url> <dest>",
 		LongHelp: "Download files over HTTP (and UNC on Windows)",
 		Func:     Fetch,
@@ -176,5 +175,4 @@ func RegisterCommands(sh *ishell.Shell) {
 		LongHelp: "Look for a file name by regex pattern",
 		Func:     Find,
 	})
-
 }

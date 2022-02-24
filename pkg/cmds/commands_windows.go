@@ -91,4 +91,11 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 		LongHelp: "Resume use of primary token",
 		Func:     RevToSelf,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "download",
+		Help:     "download from config'd share",
+		LongHelp: "Default download from smb share: '//$RHOST/c'",
+		Func:     Download,
+	})
 }
