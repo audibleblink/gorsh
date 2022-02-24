@@ -16,7 +16,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-//go:embed assemblies/*
+//go:embed embed/*
 var Assemblies embed.FS
 
 type CLR struct {
