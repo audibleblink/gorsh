@@ -77,6 +77,18 @@ func (u *User) String() string {
 	return out
 }
 
+func InitialInfo() string {
+	var output string
+	output += header("User")
+	if user, err := UserInfo(); err == nil {
+		output += user.String()
+	}
+
+	dir, _ := os.Getwd()
+	output += fmt.Sprintf("Current Directory: %s", dir)
+	return output
+}
+
 func SysInfo() string {
 	var output string
 	output += header("Host")
@@ -87,6 +99,7 @@ func SysInfo() string {
 	if user, err := UserInfo(); err == nil {
 		output += user.String()
 	}
+
 	output += header("Network")
 	if networks, err := NetworkInfo(); err == nil {
 		var netString string
@@ -95,6 +108,7 @@ func SysInfo() string {
 		}
 		output += netString
 	}
+
 	dir, _ := os.Getwd()
 	output += fmt.Sprintf("Current Directory: %s", dir)
 	return output
@@ -184,9 +198,9 @@ func _printer(template string, p printable) string {
 
 func header(name string) string {
 	var output string
-	output += "\n========================================\n"
+	output += "\n===============================\n"
 	output += name + "\n"
-	output += "========================================\n"
+	output += "===============================\n"
 	return output
 }
 

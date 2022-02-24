@@ -31,7 +31,8 @@ func main() {
 	flag.Parse()
 
 	if *dev {
-		core.StartShell(os.Stdin)
+		myconn.Conn = os.Stdin
+		core.StartShell()
 	}
 
 	if connectString != "" && fingerPrint != "" {
