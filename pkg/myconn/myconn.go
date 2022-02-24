@@ -1,6 +1,9 @@
 package myconn
 
-import "io"
+import (
+	"io"
+	"strings"
+)
 
 var (
 	Conn             io.ReadWriteCloser
@@ -16,4 +19,9 @@ type Writer interface {
 func Send(conn Writer, msg string) {
 	conn.Write([]byte(msg))
 	conn.Write([]byte("\n"))
+}
+
+func Host() string {
+	split := strings.Split(ConnectionString, ":")
+	return split[0]
 }

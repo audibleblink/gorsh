@@ -2,17 +2,15 @@ package cmds
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/abiosoft/ishell"
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
 	"git.hyrule.link/blink/gorsh/pkg/pivot"
+	"github.com/abiosoft/ishell"
 )
 
 func Pivot(c *ishell.Context) {
-	connSlice := strings.Split(myconn.ConnectionString, ":")
 	// ligolo's default listen port
-	host := fmt.Sprintf("%s:11601", connSlice[0])
+	host := fmt.Sprintf("%s:11601", myconn.Host())
 	if len(c.Args) == 1 {
 		host = c.Args[0]
 	}
