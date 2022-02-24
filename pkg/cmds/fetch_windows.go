@@ -9,9 +9,14 @@ import (
 )
 
 func Download(c *ishell.Context) {
-	if len(c.Args) != 2 {
+	if len(c.Args) < 1 {
 		c.Println(c.Cmd.LongHelp)
 		return
+	}
+
+	if len(c.Args) == 1 {
+		dst := filepath.Base(c.Args[0])
+		c.Args = append(c.Args, dst)
 	}
 
 	src := fmt.Sprintf("//%s/c/%s", myconn.Host(), c.Args[0])
