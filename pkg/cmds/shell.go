@@ -1,9 +1,9 @@
 package cmds
 
 import (
-	"github.com/abiosoft/ishell"
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
 	"git.hyrule.link/blink/gorsh/pkg/shell"
+	"github.com/abiosoft/ishell"
 )
 
 func Shell(c *ishell.Context) {
@@ -21,13 +21,9 @@ func Exec(c *ishell.Context) {
 		return
 	}
 
-	cmd := shell.GetShell()
-	cmd.Args = append(cmd.Args, "-c")
-	cmd.Args = append(cmd.Args, c.Args...)
-	err := cmd.Start()
+	_, err := shell.BGExec(c.Args[0], c.Args[1:])
 	if err != nil {
-		c.Println(err.Error())
+		c.Printf("couldn't start: %s\n", err)
 		return
 	}
-	c.Printf("started %d\n", cmd.Process.Pid)
 }

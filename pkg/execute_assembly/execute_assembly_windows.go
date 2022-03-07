@@ -73,7 +73,7 @@ func (e CLR) Execute(args []string) (stdout, stderr string) {
 }
 
 func unzippedBytes(name string) (asmBytes []byte, err error) {
-	file := fmt.Sprintf("assemblies/%s.exe.gz", name)
+	file := fmt.Sprintf("embed/%s.exe.gz", name)
 	gZipFile, err := Assemblies.Open(file)
 	if err != nil {
 		return

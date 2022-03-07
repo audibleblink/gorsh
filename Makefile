@@ -170,7 +170,7 @@ share:
 
   - name: t
     path: /samba/tools
-    browsable: yes
+    browsable: no
     readonly: yes
     guestok: yes
 endef
