@@ -105,4 +105,11 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 		LongHelp: "Default download from smb share: '//${RHOST}/e/'",
 		Func:     Upload,
 	})
+
+	sh.AddCmd(&ishell.Cmd{
+		Name:     "procdump",
+		Help:     "procdump <pid>",
+		LongHelp: "dump process memory",
+		Func:     Procdump,
+	})
 }
