@@ -113,3 +113,5 @@ func RegisterWindowsCommands(sh *ishell.Shell) {
 		Func:     Procdump,
 	})
 }
+
+func RegisterNotWindowsCommands(sh *ishell.Shell) {}

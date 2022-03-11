@@ -9,3 +9,4 @@ ssh.json
 *.exe.gz
 .docker/data/*
 docker-compose.yml
+.assemblies.cache

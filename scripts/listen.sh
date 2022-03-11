@@ -19,19 +19,19 @@ tmux has-session -t "${NAME}" || tmux new-session -d -s "${NAME}"
 
 # Create window in the created session and start a socket listener connected to stdio
 IP=$(lsof -Pni | grep "socat.*$PORT" | tail -n 1 | sed 's/>/ /g' | awk '{ print $10 }')
-tmux new-window -t "${NAME}" -a -n "$IP" "socat UNIX-LISTEN:${SOCKF},umask=0077 READLINE"
+tmux new-window -a -t "${NAME}" -n "${IP}" "stty -echo; socat -d -d UNIX-LISTEN:${SOCKF},umask=0077 READLINE"
 
-# Wait 5 seconds for shell to come in; kill listener/window otherwise
+# Wait 3 seconds for shell to come in; kill listener/window otherwise
 breaker=0
 while :; do
         [[ -e ${SOCKF} ]] && break
         sleep 1
         breaker=$[breaker+1]
-        if [[ $breaker -ge 5 ]]; then
+        if [[ $breaker -ge 3 ]]; then
                 sess="$(tmux list-windows -t ${NAME} | cut -d ':' -f 1 | tail -1)"
                 kill_window "${sess}"
         fi
 done
 
 # Hook up stdio to the listening socket in the tmux session
-socat STDIO UNIX-CONNECT:${SOCKF}
+socat stdio UNIX-CONNECT:${SOCKF}
