@@ -85,7 +85,7 @@ dll:  ## creates a windows dll. exports are definded in `cmd/gorsh-dll/dllmain.g
 ##############
 start-ligolo:  ## configures the necessary tun interfaces and starts ligolo. requires root
 	ip tuntap add user player1 ligolo mode tun
-	ip link add br0 type bridge
+	ip link set ligolo up
 	$(LIGOLO) -selfcert
 
 ##############
