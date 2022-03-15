@@ -1,12 +1,11 @@
 package myconn
 
 import (
-	"io"
 	"strings"
 )
 
 var (
-	Conn             io.ReadWriteCloser
+	Conn             Writer
 	ConnectionString string
 )
 
