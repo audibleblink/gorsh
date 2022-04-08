@@ -9,7 +9,7 @@ import (
 
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-runewidth"
-	"go-tty"
+	"tty"
 )
 
 type ctx struct {
