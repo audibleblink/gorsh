@@ -1,6 +1,6 @@
 module git.hyrule.link/blink/gorsh
 
-go 1.17
+go 1.18
 
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20211005130812-5bb3c17173e5
@@ -9,7 +9,6 @@ require (
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/audibleblink/dllinquent v0.2.1
 	github.com/audibleblink/getsystem v0.2.0
-	github.com/audibleblink/gorsh v0.0.0-20210703023409-710eefa1835f
 	github.com/audibleblink/ligolo-ng v0.4.0
 	github.com/audibleblink/memutils v0.0.2
 	github.com/fatih/structs v1.1.0
@@ -25,6 +24,8 @@ require (
 
 require (
 	github.com/Binject/debug v0.0.0-20211007083345-9605c99179ee // indirect
+	github.com/chzyer/logex v1.1.10 // indirect
+	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect

