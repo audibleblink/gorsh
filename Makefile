@@ -81,7 +81,7 @@ dll:  ## creates a windows dll. exports are definded in `cmd/gorsh-dll/dllmain.g
 		cmd/gorsh-dll/dllmain.go
 
 listen: $(SERVER) ## start listening for callbacks on LPORT
-	$< | bash
+	$< -p ${LPORT} -i ${LHOST}
 
 ##############
 # LIGOLO MGMT
@@ -118,10 +118,9 @@ smblogs: ## monitor incoming smb connections
 ##############
 .assemblies.cache:
 	curl -o $(@F) -H "Accept: application/vnd.github.v3+json" \
-  ${assembly_repo}/NetFramework_${target_vers}_Any
+	${assembly_repo}/NetFramework_${target_vers}_Any
 
 list-assemblies: .assemblies.cache ## list available assemblies to embed
-	env
 	jq -r '.[].name' < $< | tr [:upper:] [:lower:]
 
 choose-assemblies: $(FZF) ## choose assemblies to embed w/ fzf
@@ -137,10 +136,10 @@ $(ASSEMBLY_PATH)/%.gz: .assemblies.cache
 	curl -sL "$${url}" | gzip -> ${target}
 
 clean: ## reset the project
-	rm -rf ${OUT} certs/* docker-compose.yml .docker/data/* .assemblies.cache
+	rm -rf ${OUT} docker-compose.yml .docker/data/* .assemblies.cache .state/*
 
-superclean: clean ## also delete assemblies
-	rm pkg/execute_assembly/embed/*
+superclean: clean ## also delete assemblies and certs
+	rm pkg/execute_assembly/embed/* certs/*
 
 
 # TLS cert targets
@@ -217,4 +216,4 @@ endef
 help:
 	@grep -h -E '^[\$a-zA-Z\._-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: help clean smblogs stop-smb start-smb start-ligolo dll shellcode listen shellcode $(PLATFORMS) all ${ASSEMBLIES} list-assemblies choose-assemblies
+.PHONY: help clean smblogs server stop-smb start-smb start-ligolo dll shellcode listen shellcode $(PLATFORMS) all list-assemblies choose-assemblies
