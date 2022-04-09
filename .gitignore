@@ -1,12 +1,11 @@
-server.*
 certs
 !build/gorsh.c
 build
-id_*
-ssh.json
 .vscode
 *.exe
 *.exe.gz
 .docker/data/*
 docker-compose.yml
 .assemblies.cache
+.state
+.gorsh-history

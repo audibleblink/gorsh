@@ -3,9 +3,10 @@ module server
 go 1.18
 
 require (
+	github.com/disneystreaming/gomux v0.0.0-20200305000114-de122d6df124
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/sirupsen/logrus v1.8.1
-	github.com/wricardo/gomux v0.0.0-20191125190231-fba15e6e61d9
+	github.com/wader/readline v0.0.0-20220117233529-692d84ca36e2
 )
 
 require (

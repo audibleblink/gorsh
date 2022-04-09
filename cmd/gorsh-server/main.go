@@ -8,17 +8,16 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
-	"tty"
 
+	"github.com/disneystreaming/gomux"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
-	"github.com/wricardo/gomux"
+	"github.com/wader/readline"
 )
 
 var opts struct {
@@ -27,8 +26,6 @@ var opts struct {
 	Keys   string `short:"k" long:"keys" description:"Path to folder with server.{pem,key}" default:"./certs" required:"true"`
 	Socket string `short:"s" long:"socket" description:"Domain socket from which the program reads"`
 }
-
-var sessions = make(map[string]*gomux.Session)
 
 func init() {
 	_, err := flags.Parse(&opts)
@@ -45,7 +42,7 @@ func init() {
 	// it needs to be piped to bash in order to work.
 	// Because of this, all logging is sent to stderr
 	log.SetOutput(os.Stderr)
-	// log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.DebugLevel)
 
 	// ensure socket folder exists
 	if _, err := os.Stat(".state"); os.IsNotExist(err) {
@@ -53,7 +50,7 @@ func init() {
 	}
 
 	// account for existing session to avoid 'duplicate session' error
-	initSessions()
+	// initSessions()
 }
 
 func main() {
@@ -102,14 +99,11 @@ func main() {
 		defer listener.Close()
 		log.WithField("socket", opts.Socket).Info("Listener started")
 
-		for {
-			conn, err := listener.Accept()
-			if err != nil {
-				log.Error(err)
-				continue
-			}
-			go startShell(conn)
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Error(err)
 		}
+		startShell(conn)
 	}
 
 }
@@ -130,25 +124,26 @@ func newTLSListener() (net.Listener, error) {
 func startShell(conn net.Conn) {
 	log.WithFields(log.Fields{"port": opts.Port, "host": opts.Iface}).Info("Incoming")
 
-	// continuously read the incoming data and print to stdout
-	go func() { io.Copy(os.Stdout, conn) }()
+	conf := &readline.Config{
+		ForceUseInteractive: true,
+	}
 
-	teaTeeWhy, err := tty.Open()
+	tty, err := readline.NewEx(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer teaTeeWhy.Close()
+	defer tty.Close()
 
-	// allows catching ctrl+c remotely
-	restore, err := teaTeeWhy.Raw()
-	if err != nil {
-		log.Errorf("failed to enter raw: %s\n", err)
-		restore()
-	}
-	defer restore()
+	// BUG: enabling raw allows for tab completion and
+	// capturing ctrl-*, but you lose the `shell`
+	// command
+	// tty.Terminal.EnterRawMode()
+
+	// continuously read the incoming data and print to stdout
+	go func() { io.Copy(tty.Stdout(), conn) }()
 
 	// read stdin from user and send to remote implant
-	io.Copy(conn, teaTeeWhy.Input())
+	io.Copy(conn, tty.Operation.GetConfig().Stdin)
 }
 
 func implantInfo(conn net.Conn) (hostname, username string, err error) {
@@ -194,23 +189,37 @@ func prepareTmux(conn net.Conn) (string, error) {
 		return "", fmt.Errorf("failed getting implant info: %w", err)
 	}
 
-	if sessions[hostname] == nil {
-		log.WithField("host", hostname).Info("new host connected, creating session")
-		sessions[hostname] = gomux.NewSession(hostname, os.Stdout)
+	var session *gomux.Session
+	exists, err := gomux.CheckSessionExists(hostname)
+	if err != nil {
+		return "", err
 	}
 
-	session := sessions[hostname]
-	window := session.AddWindow(username)
+	if exists {
+		log.WithField("host", hostname).Debug("reusing existing session")
+		session = &gomux.Session{Name: hostname}
+	} else {
+		log.WithField("host", hostname).Info("new host connected, creating session")
+		session, err = gomux.NewSession(hostname)
+		if err != nil {
+			log.Warn(err)
+		}
+	}
+
+	window, err := session.AddWindow(username)
+	if err != nil {
+		log.Warn(err)
+	}
 
 	path, err := genTempFilename(username)
 	if err != nil {
 		return "", err
 	}
 
+	window.Panes[0].Exec(`echo -e '\a'`) // ring a bell
 	self := os.Args[0]
 	cmd := fmt.Sprintf("%s -s %s", self, path)
-	window.Exec(`echo -e '\a'`) // ring a bell
-	window.Exec(cmd)
+	window.Panes[0].Exec(cmd)
 	log.WithFields(log.Fields{"session": session.Name, "window": username}).Info("new shell in tmux")
 	return path, nil
 }
@@ -229,6 +238,7 @@ func proxyConnToSocket(conn net.Conn, sockF string) {
 	// forward socket to tcp
 	wg.Add(1)
 	go (func(socket net.Conn, conn net.Conn) {
+		defer conn.Close()
 		defer wg.Done()
 		io.Copy(conn, socket)
 	})(socket, conn)
@@ -244,21 +254,4 @@ func proxyConnToSocket(conn net.Conn, sockF string) {
 	// keep from returning until sockets close so we
 	// can cleanup the socket file using `defer`
 	wg.Wait()
-}
-
-func initSessions() {
-	for _, name := range sessionList() {
-		sessions[name] = &gomux.Session{Name: name}
-	}
-}
-
-func sessionList() []string {
-	// cmd := "tmux list-sessions -F #S"
-	cmd := exec.Command("tmux", "list-sessions", "-F", "#S")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Panic(err)
-	}
-
-	return strings.Split(string(output), "\n")
 }
