@@ -9,9 +9,9 @@ func Enum(c *ishell.Context) {
 	c.Println("Type: enum help")
 }
 
-func executeWithProgress(scriptB64 string, c *ishell.Context) {
+func executeWithProgress(script string, c *ishell.Context) {
 	c.ProgressBar().Start()
-	out, err := execute(scriptB64)
+	out, err := execute(script)
 	if err != nil {
 		c.ProgressBar().Stop()
 		c.Println(err.Error())

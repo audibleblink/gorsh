@@ -1,11 +1,11 @@
 package cmds
 
 import (
-	"fmt"
 	"os/exec"
+	"strings"
 
-	"github.com/abiosoft/ishell"
 	"git.hyrule.link/blink/gorsh/pkg/enum"
+	"github.com/abiosoft/ishell"
 )
 
 func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
@@ -13,8 +13,8 @@ func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
 		Name: "linenum",
 		Help: "github.com/rebootuser/linenum",
 		Func: func(c *ishell.Context) {
-			b64 := enum.LinEnum().Base64()
-			executeWithProgress(b64, c)
+			scrpt := enum.LinEnum().String()
+			executeWithProgress(scrpt, c)
 		},
 	})
 
@@ -22,14 +22,15 @@ func addSubEnumCmds(sh *ishell.Cmd) *ishell.Cmd {
 		Name: "linpeas",
 		Help: "github.com/carlospolop",
 		Func: func(c *ishell.Context) {
-			b64 := enum.LinPeas().Base64()
-			executeWithProgress(b64, c)
+			scrpt := enum.LinPeas().String()
+			executeWithProgress(scrpt, c)
 		},
 	})
 	return sh
 }
 
-func execute(scriptB64 string) ([]byte, error) {
-	cmd := fmt.Sprintf(" echo %s | base64 -d | bash", scriptB64)
-	return exec.Command("bash", "-c", cmd).Output()
+func execute(script string) ([]byte, error) {
+	c := exec.Command("/bin/bash")
+	c.Stdin = strings.NewReader(script)
+	return c.Output()
 }

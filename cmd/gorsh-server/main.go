@@ -134,10 +134,8 @@ func startShell(conn net.Conn) {
 	}
 	defer tty.Close()
 
-	// BUG: enabling raw allows for tab completion and
-	// capturing ctrl-*, but you lose the `shell`
-	// command
 	tty.Terminal.EnterRawMode()
+	defer tty.Terminal.ExitRawMode()
 
 	// continuously read the incoming data and print to stdout
 	go func() { io.Copy(tty.Stdout(), conn) }()
