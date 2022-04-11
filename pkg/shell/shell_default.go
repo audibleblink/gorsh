@@ -9,8 +9,8 @@ import (
 
 func GetShell() *exec.Cmd {
 	// must be pty in order to interact remotely
-	// TODO cycle through many type of pty invocation
-	// in case sript isn't present
+	// TODO cycle through many types of pty invocations
+	// in case script isn't present
 	cmd := exec.Command("/usr/bin/script", "-qc", "/bin/bash", "/dev/null")
 	return cmd
 }
