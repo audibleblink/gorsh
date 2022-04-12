@@ -189,6 +189,10 @@ func prepareTmux(conn net.Conn) (string, error) {
 		return "", fmt.Errorf("failed getting implant info: %w", err)
 	}
 
+	// windows gets usernames by [domain|computer]\\user.
+	// doesn't play nice with tmux + filepaths
+	username = strings.ReplaceAll(username, `\`, "_")
+
 	exists, err := gomux.CheckSessionExists(hostname)
 	if err != nil {
 		return "", err

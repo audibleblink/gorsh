@@ -1,19 +1,17 @@
 package cmds
 
 import (
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
 	"git.hyrule.link/blink/gorsh/pkg/shell"
 	"github.com/abiosoft/ishell"
 )
 
 func Shell(c *ishell.Context) {
-	cmd := shell.GetShell()
+	err := shell.GetShell()
+	if err != nil {
+		c.Print(err)
+		return
+	}
 
-	cmd.Stderr = myconn.Conn
-	cmd.Stdin = myconn.Conn
-	cmd.Stdout = myconn.Conn
-
-	cmd.Run()
 }
 
 func Exec(c *ishell.Context) {

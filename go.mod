@@ -24,6 +24,7 @@ require (
 
 require (
 	github.com/Binject/debug v0.0.0-20211007083345-9605c99179ee // indirect
+	github.com/UserExistsError/conpty v0.1.0 // indirect
 	github.com/chzyer/logex v1.1.10 // indirect
 	github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 // indirect
 	github.com/creack/pty v1.1.18 // indirect
