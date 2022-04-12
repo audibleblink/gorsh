@@ -27,6 +27,8 @@ var opts struct {
 	Socket string `short:"s" long:"socket" description:"Domain socket from which the program reads"`
 }
 
+var sessions = make(map[string]*gomux.Session)
+
 func init() {
 	_, err := flags.Parse(&opts)
 	// the flags package returns an error when calling --help for
@@ -187,24 +189,29 @@ func prepareTmux(conn net.Conn) (string, error) {
 		return "", fmt.Errorf("failed getting implant info: %w", err)
 	}
 
-	var session *gomux.Session
 	exists, err := gomux.CheckSessionExists(hostname)
 	if err != nil {
 		return "", err
 	}
 
-	if exists {
-		log.WithField("host", hostname).Debug("reusing existing session")
-		session = &gomux.Session{Name: hostname}
-	} else {
+	// not yet seen host
+	if !exists {
 		log.WithField("host", hostname).Info("new host connected, creating session")
-		session, err = gomux.NewSession(hostname)
+		sessions[hostname], err = gomux.NewSession(hostname)
 		if err != nil {
 			log.Warn(err)
 		}
 	}
 
-	window, err := session.AddWindow(username)
+	// session in tmux, but not tracked with server yet
+	if exists && sessions[hostname] == nil {
+		log.WithField("host", hostname).Debug("creating new cached session")
+		sessions[hostname] = &gomux.Session{Name: hostname}
+	}
+
+	session := sessions[hostname]
+	id := fmt.Sprintf("%s.%d", username, session.NextWindowNumber)
+	window, err := session.AddWindow(id)
 	if err != nil {
 		log.Warn(err)
 	}
