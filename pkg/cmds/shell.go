@@ -6,12 +6,12 @@ import (
 )
 
 func Shell(c *ishell.Context) {
-	err := shell.GetShell()
+	sh, err := shell.GetShell()
 	if err != nil {
 		c.Print(err)
 		return
 	}
-
+	sh.Wait()
 }
 
 func Exec(c *ishell.Context) {
