@@ -221,6 +221,9 @@ func ProcessActionQueue() { run() }
 //export RegisterDLL
 func RegisterDLL() { run() }
 
+//export RegisterClass
+func RegisterClass() { run() }
+
 //export Run
 func Run() { run() }
 
