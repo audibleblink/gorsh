@@ -26,9 +26,7 @@ require (
 	github.com/sirupsen/logrus v1.4.1
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/valyala/gozstd v1.2.1
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
-	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
-	golang.org/x/sys v0.0.0-20190514135907-3a4b5fb9f71f // indirect
-	golang.org/x/text v0.3.2
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/text v0.4.0
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
