@@ -14,13 +14,14 @@ PLATFORMS = linux windows darwin
 LHOST ?= localhost
 # port the reverse shell will call back to
 LPORT ?= 8443
-# exfil and staging path to serve over smb
+# exfil and tool path to serve over smb
 TOOLS ?= /srv/smb/tools
 EXFIL ?= /srv/smb/exfil
 
 ASSEMBLY_PATH = pkg/execute_assembly/embed
 assembly_repo = https://api.github.com/repos/flangvik/sharpcollection/contents/
 target_vers = 4.5
+
 
 ##############
 #  ADVANCED
@@ -34,16 +35,6 @@ endif
 LDFLAGS = "-s -w -X main.connectString=${LHOST}:${LPORT} -X main.fingerPrint=${FINGERPRINT}"
 # references the calling target within each block
 target = $(word 1, $@)
-
-
-##############
-# DEPENDENCY
-# MANAGEMENT
-##############
-LIGOLO = ${HOME}/.local/bin/ligolo
-GODONUT = ${GOPATH}/bin/go-donut
-GARBLE = ${GOPATH}/bin/garble
-FZF = ${GOPATH}/bin/fzf
 
 
 ##############
@@ -90,6 +81,7 @@ start-ligolo:  ## configures the necessary tun interfaces and starts ligolo. req
 	sudo ip tuntap add user player1 ligolo mode tun
 	sudo ip link set ligolo up
 	$(LIGOLO) -selfcert
+
 
 ##############
 # CIFS MGMNT
@@ -142,22 +134,29 @@ superclean: clean ## also delete assemblies and certs
 	rm pkg/execute_assembly/embed/* certs/*
 
 
+##############
+# DEPENDENCY
+# MANAGEMENT
+##############
+LIGOLO = ${HOME}/.local/bin/ligolo
+GODONUT = ${GOPATH}/bin/go-donut
+GARBLE = ${GOPATH}/bin/garble
+FZF = ${GOPATH}/bin/fzf
+
+$(LIGOLO):
+	go install github.com/tnpitsecurity/ligolo-ng@latest
+$(GODONUT):
+	go install github.com/Binject/go-donut@latest
+$(GARBLE):
+	go install mvdan.cc/garble@latest
+$(FZF):
+	go install github.com/junegunn/fzf@latest
+
+
 # TLS cert targets
 SRV_KEY = certs/server.key
 SRV_PEM = certs/server.pem
 FINGERPRINT = $(shell openssl x509 -fingerprint -sha256 -noout -in ${SRV_PEM} | cut -d '=' -f2)
-
-$(LIGOLO):
-	go install github.com/tnpitsecurity/ligolo-ng@latest
-
-$(GODONUT):
-	go install github.com/Binject/go-donut@latest
-
-$(GARBLE):
-	go install mvdan.cc/garble@latest
-
-$(FZF):
-	go install github.com/junegunn/fzf@latest
 
 $(SRV_KEY) $(SRV_PEM) &:
 	mkdir -p certs
