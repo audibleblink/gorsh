@@ -171,10 +171,10 @@ $(SRV_KEY) $(SRV_PEM) &:
 ##############
 
 define DOCKERSMB
-version: "3.5"
+version: "3.8"
 services:
  samba:
-  image: crazymax/samba
+  image: crazymax/samba:latest
   container_name: samba
   environment:
    SAMBA_LOG_LEVEL: 2

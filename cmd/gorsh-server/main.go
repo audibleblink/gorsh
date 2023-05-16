@@ -46,7 +46,7 @@ func init() {
 	log.SetOutput(os.Stderr)
 	log.SetLevel(log.DebugLevel)
 
-	// ensure socket folder exists
+	// Ensure socket folder exists
 	if _, err := os.Stat(".state"); os.IsNotExist(err) {
 		os.Mkdir(".state", 0700)
 	}
@@ -64,7 +64,6 @@ func main() {
 		// Once the shell is caught over TLS, it's unwrapped and sent
 		// to a local socket, where it will later be read by a new instance
 		// of the server configured to read that socket from within a tmux pane
-
 		listener, err = newTLSListener()
 		if err != nil {
 			log.Fatal(err)
