@@ -152,6 +152,7 @@ func implantInfo(conn net.Conn) (hostname, username string, err error) {
 		err = fmt.Errorf("hostname read failed: %w", err)
 		return
 	}
+	hostname = sanitizeforTmux(hostname)
 
 	username, err = reader.ReadString('\n')
 	if err != nil {
@@ -159,9 +160,7 @@ func implantInfo(conn net.Conn) (hostname, username string, err error) {
 		return
 	}
 
-	// tmux session names can't contain "."
-	hostname = strings.ReplaceAll(strings.TrimSuffix(hostname, "\n"), ".", "_")
-	username = strings.TrimSuffix(username, "\n")
+	username = sanitizeforTmux(username)
 	return
 }
 
@@ -187,10 +186,6 @@ func prepareTmux(conn net.Conn) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed getting implant info: %w", err)
 	}
-
-	// windows gets usernames by [domain|computer]\\user.
-	// doesn't play nice with tmux + filepaths
-	username = strings.ReplaceAll(username, `\`, "_")
 
 	exists, err := gomux.CheckSessionExists(hostname)
 	if err != nil {
@@ -262,4 +257,14 @@ func proxyConnToSocket(conn net.Conn, sockF string) {
 	// keep from returning until sockets close so we
 	// can cleanup the socket file using `defer`
 	wg.Wait()
+}
+
+func sanitizeforTmux(in string) (data string) {
+	// tmux session names can't contain ".", "\", " "
+	// windows gets usernames by [domain|computer]\\user.
+	data = strings.TrimSuffix(in, "\n")
+	data = strings.ReplaceAll(data, ".", "_")
+	data = strings.ReplaceAll(data, `\`, "_")
+	data = strings.ReplaceAll(data, ` `, "-")
+	return
 }
