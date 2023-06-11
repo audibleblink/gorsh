@@ -7,7 +7,8 @@ SERVER = ${OUT}/${APP}-server
 # artifact output directory
 OUT ?= build
 # build command prefix
-BUILD = go build
+BUILD = garble build
+# BUILD = go build
 # operation systems to build for
 PLATFORMS = linux windows darwin
 # host the reverse shell will call back to
