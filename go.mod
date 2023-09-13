@@ -15,7 +15,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/hashicorp/yamux v0.1.1
 	github.com/jpillora/icmpscan v1.3.1
-	github.com/klauspost/compress v1.16.5
+	github.com/klauspost/compress v1.16.7
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.9.0
 	golang.org/x/sync v0.2.0
