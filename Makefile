@@ -102,12 +102,11 @@ stop-smb: ## stop the smb container
 	docker stop samba
 
 smblogs: ## monitor incoming smb connections
-	docker logs -f samba | grep 'connect\|numopen'
+	docker logs -f samba | tail -f | grep 'connect\|numopen'
 
 
 ##############
-# ASSEMBLY
-# EMBEDDING
+# ASSEMBLY EMBEDDING
 ##############
 .assemblies.cache:
 	curl -o $(@F) -H "Accept: application/vnd.github.v3+json" \
@@ -136,8 +135,7 @@ superclean: clean ## also delete assemblies and certs
 
 
 ##############
-# DEPENDENCY
-# MANAGEMENT
+# DEPENDENCY MANAGEMENT
 ##############
 LIGOLO = ${HOME}/.local/bin/ligolo
 GODONUT = ${GOPATH}/bin/go-donut
@@ -166,8 +164,7 @@ $(SRV_KEY) $(SRV_PEM) &:
 
 
 ##############
-# TEMPLATE
-# DEFINITIONS
+# TEMPLATE DEFINITIONS
 ##############
 
 define DOCKERSMB
@@ -207,7 +204,7 @@ share:
   - name: t
     path: /samba/tools
     browsable: no
-    readonly: yes
+    readonly: no
     guestok: yes
 endef
 
