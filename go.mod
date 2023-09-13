@@ -5,7 +5,7 @@ go 1.18
 require (
 	code.cloudfoundry.org/bytefmt v0.0.0-20230406175530-3579ae0680eb
 	github.com/Ne0nd0g/go-clr v1.0.3
-	github.com/abiosoft/ishell v2.0.0+incompatible
+	github.com/abiosoft/ishell v2.0.2+incompatible
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/audibleblink/dllinquent v0.2.4
 	github.com/audibleblink/getsystem v0.2.0
