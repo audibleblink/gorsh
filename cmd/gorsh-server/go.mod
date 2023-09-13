@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/disneystreaming/gomux v0.0.0-20200305000114-de122d6df124
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/mattn/go-tty v0.0.4
+	github.com/mattn/go-tty v0.0.5
 	github.com/sirupsen/logrus v1.8.1
 )
 
