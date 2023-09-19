@@ -6,7 +6,7 @@ import (
 
 	"github.com/abiosoft/ishell"
 
-	"git.hyrule.link/blink/gorsh/pkg/zip"
+	"git.i.ctrl.red/blink/gorsh/pkg/zip"
 )
 
 func Zipcat(c *ishell.Context) {

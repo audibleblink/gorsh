@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	"git.hyrule.link/blink/gorsh/pkg/sitrep"
+	"git.i.ctrl.red/blink/gorsh/pkg/sitrep"
 	"github.com/abiosoft/ishell"
 	"github.com/audibleblink/getsystem"
 	"golang.org/x/sys/windows"

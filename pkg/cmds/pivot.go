@@ -3,8 +3,8 @@ package cmds
 import (
 	"fmt"
 
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
-	"git.hyrule.link/blink/gorsh/pkg/pivot"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/pivot"
 	"github.com/abiosoft/ishell"
 )
 

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"git.hyrule.link/blink/gorsh/pkg/core"
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/core"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
 )
 
 var (

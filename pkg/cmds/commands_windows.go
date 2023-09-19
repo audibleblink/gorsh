@@ -3,7 +3,7 @@ package cmds
 import (
 	"strings"
 
-	"git.hyrule.link/blink/gorsh/pkg/execute_assembly"
+	"git.i.ctrl.red/blink/gorsh/pkg/execute_assembly"
 	"github.com/abiosoft/ishell"
 )
 

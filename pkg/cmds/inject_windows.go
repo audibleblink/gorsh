@@ -1,7 +1,7 @@
 package cmds
 
 import (
-	"git.hyrule.link/blink/gorsh/pkg/shell"
+	"git.i.ctrl.red/blink/gorsh/pkg/shell"
 
 	"github.com/abiosoft/ishell"
 )

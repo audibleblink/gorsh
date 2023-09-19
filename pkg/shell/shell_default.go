@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
 	"github.com/bishopfox/sliver/implant/sliver/shell"
 )
 

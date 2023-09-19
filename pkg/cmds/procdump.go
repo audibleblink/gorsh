@@ -5,7 +5,7 @@ package cmds
 import (
 	"strconv"
 
-	"git.hyrule.link/blink/gorsh/pkg/procdump"
+	"git.i.ctrl.red/blink/gorsh/pkg/procdump"
 	"github.com/abiosoft/ishell"
 )
 

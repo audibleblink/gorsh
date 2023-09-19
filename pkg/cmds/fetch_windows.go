@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"git.hyrule.link/blink/gorsh/pkg/fetch"
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/fetch"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
 	"github.com/abiosoft/ishell"
 )
 

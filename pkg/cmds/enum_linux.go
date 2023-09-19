@@ -4,7 +4,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"git.hyrule.link/blink/gorsh/pkg/enum"
+	"git.i.ctrl.red/blink/gorsh/pkg/enum"
 	"github.com/abiosoft/ishell"
 )
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/abiosoft/ishell"
-	"git.hyrule.link/blink/gorsh/pkg/directory"
+	"git.i.ctrl.red/blink/gorsh/pkg/directory"
 )
 
 func Ls(c *ishell.Context) {

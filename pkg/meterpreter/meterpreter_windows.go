@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"time"
 
-	"git.hyrule.link/blink/gorsh/pkg/shell"
+	"git.i.ctrl.red/blink/gorsh/pkg/shell"
 )
 
 // Meterpreter function allows to connect back

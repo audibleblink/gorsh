@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/abiosoft/ishell"
-	"git.hyrule.link/blink/gorsh/pkg/find"
+	"git.i.ctrl.red/blink/gorsh/pkg/find"
 )
 
 func Find(c *ishell.Context) {

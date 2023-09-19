@@ -3,7 +3,7 @@ package cmds
 import (
 	"github.com/abiosoft/ishell"
 
-	"git.hyrule.link/blink/gorsh/pkg/sitrep"
+	"git.i.ctrl.red/blink/gorsh/pkg/sitrep"
 )
 
 func Sitrep(c *ishell.Context) {

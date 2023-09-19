@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/abiosoft/ishell"
-	"git.hyrule.link/blink/gorsh/pkg/tokens"
+	"git.i.ctrl.red/blink/gorsh/pkg/tokens"
 )
 
 func StealToken(c *ishell.Context) {

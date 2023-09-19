@@ -11,9 +11,9 @@ import (
 	"os"
 	"time"
 
-	"git.hyrule.link/blink/gorsh/pkg/cmds"
-	"git.hyrule.link/blink/gorsh/pkg/myconn"
-	"git.hyrule.link/blink/gorsh/pkg/sitrep"
+	"git.i.ctrl.red/blink/gorsh/pkg/cmds"
+	"git.i.ctrl.red/blink/gorsh/pkg/myconn"
+	"git.i.ctrl.red/blink/gorsh/pkg/sitrep"
 	"github.com/abiosoft/ishell"
 	"github.com/abiosoft/readline"
 )
