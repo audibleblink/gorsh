@@ -205,10 +205,12 @@ func prepareTmux(conn net.Conn) (string, error) {
 	}
 
 	session := sessions[hostname]
-	id := fmt.Sprintf("%s.%d", username, session.NextWindowNumber)
+	id := fmt.Sprintf("%s.%d", username, session.NextWindowNumber+1)
 	window, err := session.AddWindow(id)
 	if err != nil {
-		log.Warn(err)
+		log.WithFields(
+			log.Fields{"session": session.Name, "window": window},
+		).Warn("AddWindow(Id) ", err)
 	}
 
 	path, err := genTempFilename(username)
@@ -216,11 +218,25 @@ func prepareTmux(conn net.Conn) (string, error) {
 		return "", err
 	}
 
-	window.Panes[0].Exec(`echo -e '\a'`) // ring a bell
+	err = window.Panes[0].Exec(`echo -e '\a'`) // ring a bell
+	if err != nil {
+		log.WithFields(
+			log.Fields{"session": session.Name, "window": id, "path": path},
+		).Warn("Exec echo: ", err)
+	}
+
 	self := os.Args[0]
 	cmd := fmt.Sprintf("%s -s %s", self, path)
-	window.Panes[0].Exec(cmd)
-	log.WithFields(log.Fields{"session": session.Name, "window": username}).Info("new shell in tmux")
+
+	err = window.Panes[0].Exec(cmd)
+	if err != nil {
+		log.WithFields(
+			log.Fields{"session": session.Name, "window": id, "cmd": cmd},
+		).Warn("Exec cmd: ", err)
+	}
+
+	log.WithFields(log.Fields{"session": session.Name, "window": username}).
+		Info("new shell in tmux")
 	return path, nil
 }
 
