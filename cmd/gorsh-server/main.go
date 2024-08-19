@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"path"
@@ -106,7 +105,6 @@ func main() {
 		}
 		startShell(conn)
 	}
-
 }
 
 func newTLSListener() (net.Listener, error) {
@@ -165,7 +163,7 @@ func implantInfo(conn net.Conn) (hostname, username string, err error) {
 }
 
 func genTempFilename(username string) (string, error) {
-	file, err := ioutil.TempFile(".state", fmt.Sprintf("%s.*.sock", username))
+	file, err := os.CreateTemp(".state", fmt.Sprintf("%s.*.sock", username))
 	if err != nil {
 		err = fmt.Errorf("temp file failed: %w", err)
 		return "", err
