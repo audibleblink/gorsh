@@ -7,7 +7,7 @@ SERVER = ${OUT}/${APP}-server
 # artifact output directory
 OUT ?= build
 # build command prefix
-BUILD = garble build
+BUILD = go build
 # BUILD = go build
 # operation systems to build for
 PLATFORMS = linux windows darwin
@@ -16,8 +16,8 @@ LHOST ?= localhost
 # port the reverse shell will call back to
 LPORT ?= 8443
 # exfil and tool path to serve over smb
-TOOLS ?= /srv/smb/tools
-EXFIL ?= /srv/smb/exfil
+TOOLS ?= /srv
+EXFIL ?= /srv
 
 ASSEMBLY_PATH = pkg/execute_assembly/embed
 assembly_repo = https://api.github.com/repos/flangvik/sharpcollection/contents/
@@ -96,10 +96,10 @@ docker-compose.yml:
 	@echo "$$DOCKERSMB" > $@
 
 start-smb: docker-compose.yml .docker/data/config.yml ## starts docker-smb containers that are needed by the upload/download commands. requires root
-	docker-compose up -d --force-recreate
+	podman-compose up -d --force-recreate
 
 stop-smb: ## stop the smb container
-	docker stop samba
+	podman stop samba
 
 smblogs: ## monitor incoming smb connections
 	docker logs -f samba | tail -f | grep 'connect\|numopen'
@@ -171,7 +171,7 @@ define DOCKERSMB
 version: "3.8"
 services:
  samba:
-  image: crazymax/samba:latest
+  image: docker.io/crazymax/samba:latest
   container_name: samba
   environment:
    SAMBA_LOG_LEVEL: 2
