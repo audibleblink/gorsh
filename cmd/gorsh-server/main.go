@@ -279,5 +279,6 @@ func sanitizeforTmux(in string) (data string) {
 	data = strings.ReplaceAll(data, ".", "_")
 	data = strings.ReplaceAll(data, `\`, "_")
 	data = strings.ReplaceAll(data, ` `, "-")
+	data = strings.ReplaceAll(data, `$`, "_")
 	return
 }
