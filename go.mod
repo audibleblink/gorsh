@@ -20,9 +20,9 @@ require (
 	github.com/klauspost/compress v1.17.11
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.26.0
-	golang.org/x/text v0.19.0
+	golang.org/x/sync v0.10.0
+	golang.org/x/sys v0.28.0
+	golang.org/x/text v0.21.0
 )
 
 require (
@@ -30,6 +30,7 @@ require (
 	github.com/C-Sto/BananaPhone v0.0.0-20220220002628-6585e5913761 // indirect
 	github.com/audibleblink/logerr v0.0.1 // indirect
 	github.com/awgh/rawreader v0.0.0-20200626064944-56820a9c6da4 // indirect
+	github.com/chzyer/test v1.0.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
@@ -44,7 +45,6 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
